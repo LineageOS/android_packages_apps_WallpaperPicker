@@ -16,4 +16,5 @@
 -->
 <resources>
     <color name="icon_background_launcher_wallpaper">#43A047</color>
+    <color name="icon_background_nowallpaper">#000000</color>
 </resources>
