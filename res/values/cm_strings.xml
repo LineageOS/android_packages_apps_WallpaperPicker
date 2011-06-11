@@ -18,6 +18,5 @@
 -->
 
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <color name="icon_background_launcher_wallpaper">#43A047</color>
-    <color name="icon_background_nowallpaper">#000000</color>
+    <string name="no_wallpaper">No wallpaper</string>
 </resources>
