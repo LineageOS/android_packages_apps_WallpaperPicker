@@ -4,6 +4,7 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,6 +20,7 @@ import com.android.gallery3d.common.BitmapUtils;
 import com.android.wallpaperpicker.WallpaperCropActivity.CropViewScaleAndOffsetProvider;
 import com.android.wallpaperpicker.WallpaperFiles;
 import com.android.wallpaperpicker.WallpaperPickerActivity;
+import com.android.wallpaperpicker.common.DialogUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -49,14 +51,20 @@ public class DefaultWallpaperInfo extends DrawableThumbWallpaperInfo {
     }
 
     @Override
-    public void onSave(WallpaperPickerActivity a) {
-        try {
-            WallpaperManager.getInstance(a).clear();
-            a.setResult(Activity.RESULT_OK);
-        } catch (IOException e) {
-            Log.w(TAG, "Setting wallpaper to default threw exception", e);
-        }
-        a.finish();
+    public void onSave(final WallpaperPickerActivity a) {
+        DialogUtils.showWhichWallpaperDialog(a, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    // TODO: Set based on which wallpaper user selected, in WallpaperManagerCompat.
+                    WallpaperManager.getInstance(a.getApplicationContext()).clear();
+                    a.setResult(Activity.RESULT_OK);
+                } catch (IOException e) {
+                    Log.w(TAG, "Setting wallpaper to default threw exception", e);
+                }
+                a.finish();
+            }
+        });
     }
 
     @Override
