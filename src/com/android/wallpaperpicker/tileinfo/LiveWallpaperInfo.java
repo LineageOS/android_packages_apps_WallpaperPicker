@@ -1,4 +1,4 @@
-package com.android.launcher3.wallpapertileinfo;
+package com.android.wallpaperpicker.tileinfo;
 
 import android.app.WallpaperInfo;
 import android.app.WallpaperManager;
@@ -16,8 +16,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.android.launcher3.R;
-import com.android.launcher3.WallpaperPickerActivity;
+import com.android.wallpaperpicker.R;
+import com.android.wallpaperpicker.WallpaperPickerActivity;
 
 import org.xmlpull.v1.XmlPullParserException;
 

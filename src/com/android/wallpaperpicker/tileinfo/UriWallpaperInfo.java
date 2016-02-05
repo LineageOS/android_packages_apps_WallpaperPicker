@@ -1,4 +1,4 @@
-package com.android.launcher3.wallpapertileinfo;
+package com.android.wallpaperpicker.tileinfo;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -11,10 +11,10 @@ import android.widget.Toast;
 
 import com.android.gallery3d.common.BitmapCropTask;
 import com.android.gallery3d.common.BitmapUtils;
-import com.android.launcher3.R;
-import com.android.launcher3.WallpaperPickerActivity;
 import com.android.photos.BitmapRegionTileSource;
 import com.android.photos.BitmapRegionTileSource.BitmapSource;
+import com.android.wallpaperpicker.R;
+import com.android.wallpaperpicker.WallpaperPickerActivity;
 
 public class UriWallpaperInfo extends DrawableThumbWallpaperInfo {
 
@@ -31,7 +31,7 @@ public class UriWallpaperInfo extends DrawableThumbWallpaperInfo {
     public void onClick(final WallpaperPickerActivity a) {
         a.setWallpaperButtonEnabled(false);
         final BitmapRegionTileSource.UriBitmapSource bitmapSource =
-                new BitmapRegionTileSource.UriBitmapSource(a.getContext(), mUri);
+                new BitmapRegionTileSource.UriBitmapSource(a, mUri);
         a.setCropViewTileSource(bitmapSource, true, false, null, new Runnable() {
 
             @Override
@@ -43,7 +43,7 @@ public class UriWallpaperInfo extends DrawableThumbWallpaperInfo {
                     ViewGroup parent = (ViewGroup) mView.getParent();
                     if (parent != null) {
                         parent.removeView(mView);
-                        Toast.makeText(a.getContext(), R.string.image_load_fail,
+                        Toast.makeText(a, R.string.image_load_fail,
                                 Toast.LENGTH_SHORT).show();
                     }
                 }

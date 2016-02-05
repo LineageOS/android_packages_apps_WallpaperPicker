@@ -1,18 +1,16 @@
-package com.android.launcher3;
+package com.android.wallpaperpicker;
 
 import android.view.View;
 import android.view.ViewPropertyAnimator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
-import com.android.launcher3.util.Thunk;
-
 /**
  * Callback that toggles the visibility of the target view when crop view is tapped.
  */
 public class ToggleOnTapCallback implements CropView.TouchCallback {
 
-    @Thunk final View mViewtoToggle;
+    private final View mViewtoToggle;
 
     private ViewPropertyAnimator mAnim;
     private boolean mIgnoreNextTap;

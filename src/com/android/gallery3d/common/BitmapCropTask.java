@@ -33,7 +33,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.android.launcher3.R;
+import com.android.wallpaperpicker.R;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;

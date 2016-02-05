@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.launcher3;
+package com.android.wallpaperpicker;
 
 import android.annotation.TargetApi;
 import android.app.ActionBar;
@@ -42,9 +42,6 @@ import android.widget.Toast;
 import com.android.gallery3d.common.BitmapCropTask;
 import com.android.gallery3d.common.BitmapUtils;
 import com.android.gallery3d.common.Utils;
-import com.android.launcher3.base.BaseActivity;
-import com.android.launcher3.util.Thunk;
-import com.android.launcher3.util.WallpaperUtils;
 import com.android.photos.BitmapRegionTileSource;
 import com.android.photos.BitmapRegionTileSource.BitmapSource;
 import com.android.photos.BitmapRegionTileSource.BitmapSource.InBitmapProvider;
@@ -54,8 +51,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-public class WallpaperCropActivity extends BaseActivity implements Handler.Callback {
-    private static final String LOGTAG = "Launcher3.CropActivity";
+public class WallpaperCropActivity extends Activity implements Handler.Callback {
+    private static final String LOGTAG = "WallpaperCropActivity";
 
     private static final int MSG_LOAD_IMAGE = 1;
 
@@ -65,10 +62,10 @@ public class WallpaperCropActivity extends BaseActivity implements Handler.Callb
 
     private HandlerThread mLoaderThread;
     private Handler mLoaderHandler;
-    @Thunk LoadRequest mCurrentLoadRequest;
+    private LoadRequest mCurrentLoadRequest;
     private byte[] mTempStorageForDecoding = new byte[16 * 1024];
     // A weak-set of reusable bitmaps
-    @Thunk Set<Bitmap> mReusableBitmaps =
+    private Set<Bitmap> mReusableBitmaps =
             Collections.newSetFromMap(new WeakHashMap<Bitmap, Boolean>());
 
     @Override
@@ -118,12 +115,12 @@ public class WallpaperCropActivity extends BaseActivity implements Handler.Callb
 
         // Load image in background
         final BitmapRegionTileSource.UriBitmapSource bitmapSource =
-                new BitmapRegionTileSource.UriBitmapSource(getContext(), imageUri);
+                new BitmapRegionTileSource.UriBitmapSource(this, imageUri);
         mSetWallpaperButton.setEnabled(false);
         Runnable onLoad = new Runnable() {
             public void run() {
                 if (bitmapSource.getLoadingState() != BitmapSource.State.LOADED) {
-                    Toast.makeText(getContext(), R.string.wallpaper_load_fail,
+                    Toast.makeText(WallpaperCropActivity.this, R.string.wallpaper_load_fail,
                             Toast.LENGTH_LONG).show();
                     finish();
                 } else {
@@ -148,6 +145,7 @@ public class WallpaperCropActivity extends BaseActivity implements Handler.Callb
     /**
      * This is called on {@link #mLoaderThread}
      */
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     public boolean handleMessage(Message msg) {
         if (msg.what == MSG_LOAD_IMAGE) {
@@ -206,7 +204,7 @@ public class WallpaperCropActivity extends BaseActivity implements Handler.Callb
                     }
                 }
 
-                req.result = new BitmapRegionTileSource(getContext(), req.src,
+                req.result = new BitmapRegionTileSource(WallpaperCropActivity.this, req.src,
                         mTempStorageForDecoding);
                 loadSuccess = req.src.getLoadingState() == BitmapSource.State.LOADED;
             }
@@ -229,12 +227,13 @@ public class WallpaperCropActivity extends BaseActivity implements Handler.Callb
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     public boolean isActivityDestroyed() {
-        return Utilities.ATLEAST_JB_MR1 && isDestroyed();
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1 && isDestroyed();
     }
 
-    @Thunk void addReusableBitmap(TileSource src) {
+    private void addReusableBitmap(TileSource src) {
         synchronized (mReusableBitmaps) {
-            if (Utilities.ATLEAST_KITKAT && src instanceof BitmapRegionTileSource) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
+                && src instanceof BitmapRegionTileSource) {
                 Bitmap preview = ((BitmapRegionTileSource) src).getBitmap();
                 if (preview != null && preview.isMutable()) {
                     mReusableBitmaps.add(preview);
@@ -306,13 +305,13 @@ public class WallpaperCropActivity extends BaseActivity implements Handler.Callb
 
 
     public boolean enableRotation() {
-        return getResources().getBoolean(R.bool.allow_rotation);
+        return true;
     }
 
     public void setWallpaper(Uri uri, boolean shouldFadeOutOnFinish) {
-        int rotation = BitmapUtils.getRotationFromExif(getContext(), uri);
+        int rotation = BitmapUtils.getRotationFromExif(this, uri);
         BitmapCropTask cropTask = new BitmapCropTask(
-                getContext(), uri, null, rotation, 0, 0, true, false, null);
+                this, uri, null, rotation, 0, 0, true, false, null);
         BitmapCropTask.OnEndCropHandler onEndCrop = new CropAndFinishHandler(
                 cropTask.getImageBounds(), shouldFadeOutOnFinish);
         cropTask.setOnEndCropHandler(onEndCrop);
@@ -333,7 +332,7 @@ public class WallpaperCropActivity extends BaseActivity implements Handler.Callb
         // default wallpaper size
         CropAndFinishHandler onEndCrop = new CropAndFinishHandler(new Point(0, 0),
                 shouldFadeOutOnFinish);
-        BitmapCropTask cropTask = new BitmapCropTask(getContext(), res, resId,
+        BitmapCropTask cropTask = new BitmapCropTask(this, res, resId,
                 crop, rotation, outSize.x, outSize.y, true, false, onEndCrop);
         cropTask.execute();
     }
@@ -423,7 +422,7 @@ public class WallpaperCropActivity extends BaseActivity implements Handler.Callb
         CropAndFinishHandler onEndCrop = new CropAndFinishHandler(new Point(outWidth, outHeight),
                 shouldFadeOutOnFinish);
 
-        BitmapCropTask cropTask = new BitmapCropTask(getContext(), uri,
+        BitmapCropTask cropTask = new BitmapCropTask(this, uri,
                 cropRect, cropRotation, outWidth, outHeight, true, false, onEndCrop);
         if (onBitmapCroppedHandler != null) {
             cropTask.setOnBitmapCropped(onBitmapCroppedHandler);

@@ -1,4 +1,4 @@
-package com.android.launcher3.wallpapertileinfo;
+package com.android.wallpaperpicker.tileinfo;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.android.launcher3.R;
+import com.android.wallpaperpicker.R;
 
 /**
  * WallpaperTileInfo which uses drawable as the thumbnail.

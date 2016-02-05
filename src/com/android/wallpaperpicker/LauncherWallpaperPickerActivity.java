@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.launcher3;
+package com.android.wallpaperpicker;
 
 // TODO: Remove this class
 public class LauncherWallpaperPickerActivity extends WallpaperPickerActivity {

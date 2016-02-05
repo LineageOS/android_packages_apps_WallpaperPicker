@@ -1,14 +1,14 @@
-package com.android.launcher3.wallpapertileinfo;
+package com.android.wallpaperpicker.tileinfo;
 
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 
-import com.android.launcher3.WallpaperCropActivity.CropViewScaleAndOffsetProvider;
-import com.android.launcher3.WallpaperPickerActivity;
 import com.android.photos.BitmapRegionTileSource;
 import com.android.photos.BitmapRegionTileSource.BitmapSource;
+import com.android.wallpaperpicker.WallpaperCropActivity.CropViewScaleAndOffsetProvider;
+import com.android.wallpaperpicker.WallpaperPickerActivity;
 
 public class ResourceWallpaperInfo extends DrawableThumbWallpaperInfo {
 

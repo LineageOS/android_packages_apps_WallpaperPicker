@@ -1,4 +1,4 @@
-package com.android.launcher3.wallpapertileinfo;
+package com.android.wallpaperpicker.tileinfo;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -13,8 +13,8 @@ import android.view.ViewGroup;
 
 import com.android.gallery3d.common.BitmapCropTask;
 import com.android.gallery3d.common.Utils;
-import com.android.launcher3.R;
-import com.android.launcher3.WallpaperPickerActivity;
+import com.android.wallpaperpicker.R;
+import com.android.wallpaperpicker.WallpaperPickerActivity;
 
 public abstract class WallpaperTileInfo {
 
@@ -83,5 +83,4 @@ public abstract class WallpaperTileInfo {
             return null;
         }
     }
-
 }

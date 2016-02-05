@@ -1,11 +1,11 @@
-package com.android.launcher3.wallpapertileinfo;
+package com.android.wallpaperpicker.tileinfo;
 
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 
-import com.android.launcher3.WallpaperPickerActivity;
 import com.android.photos.BitmapRegionTileSource;
 import com.android.photos.BitmapRegionTileSource.BitmapSource;
+import com.android.wallpaperpicker.WallpaperPickerActivity;
 
 import java.io.File;
 

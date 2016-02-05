@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.android.launcher3;
+package com.android.wallpaperpicker;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -27,7 +27,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
-import com.android.launcher3.wallpapertileinfo.FileWallpaperInfo;
+import com.android.wallpaperpicker.tileinfo.FileWallpaperInfo;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -37,7 +37,7 @@ import java.util.List;
 
 public class SavedWallpaperImages {
 
-    private static String TAG = "Launcher3.SavedWallpaperImages";
+    private static String TAG = "SavedWallpaperImages";
 
     public static class SavedWallpaperInfo extends FileWallpaperInfo {
 
@@ -152,7 +152,7 @@ public class SavedWallpaperImages {
         final static String COLUMN_IMAGE_FILENAME = "image";
 
         public ImageDb(Context context) {
-            super(context, context.getDatabasePath(LauncherFiles.WALLPAPER_IMAGES_DB).getPath(),
+            super(context, context.getDatabasePath(WallpaperFiles.WALLPAPER_IMAGES_DB).getPath(),
                     null, DB_VERSION);
         }
 
@@ -160,8 +160,8 @@ public class SavedWallpaperImages {
             // We used to store the saved images in the cache directory, but that meant they'd get
             // deleted sometimes-- move them to the data directory
             File oldSavedImagesFile = new File(context.getCacheDir(),
-                    LauncherFiles.WALLPAPER_IMAGES_DB);
-            File savedImagesFile = context.getDatabasePath(LauncherFiles.WALLPAPER_IMAGES_DB);
+                  WallpaperFiles.WALLPAPER_IMAGES_DB);
+            File savedImagesFile = context.getDatabasePath(WallpaperFiles.WALLPAPER_IMAGES_DB);
             if (oldSavedImagesFile.exists()) {
                 oldSavedImagesFile.renameTo(savedImagesFile);
             }
