@@ -82,16 +82,6 @@ public final class WallpaperUtils {
         }
     }
 
-    public static void suggestWallpaperDimension(Activity activity) {
-        // Only live wallpapers care about desired size. Update the size to what launcher expects.
-        final Point size = getDefaultWallpaperSize(
-                activity.getResources(), activity.getWindowManager());
-        WallpaperManager wm = WallpaperManager.getInstance(activity);
-        if (size.x != wm.getDesiredMinimumWidth() || size.y != wm.getDesiredMinimumHeight()) {
-            wm.suggestDesiredDimensions(size.x, size.y);
-        }
-    }
-
     /**
      * As a ratio of screen height, the total distance we want the parallax effect to span
      * horizontally
