@@ -34,6 +34,10 @@ public final class WallpaperUtils {
 
     public static final String WALLPAPER_WIDTH_KEY = "wallpaper.width";
     public static final String WALLPAPER_HEIGHT_KEY = "wallpaper.height";
+
+    // An intent extra to indicate the horizontal scroll of the wallpaper.
+    public static final String EXTRA_WALLPAPER_OFFSET = "com.android.launcher3.WALLPAPER_OFFSET";
+
     public static final float WALLPAPER_SCREENS_SPAN = 2f;
 
     public static void saveWallpaperDimensions(int width, int height, Activity activity) {
@@ -79,6 +83,16 @@ public final class WallpaperUtils {
         WallpaperManager wm = WallpaperManager.getInstance(activity);
         if (width != wm.getDesiredMinimumWidth() || height != wm.getDesiredMinimumHeight()) {
             wm.suggestDesiredDimensions(width, height);
+        }
+    }
+
+    public static void suggestWallpaperDimension(Activity activity) {
+        // Only live wallpapers care about desired size. Update the size to what launcher expects.
+        final Point size = getDefaultWallpaperSize(
+                activity.getResources(), activity.getWindowManager());
+        WallpaperManager wm = WallpaperManager.getInstance(activity);
+        if (size.x != wm.getDesiredMinimumWidth() || size.y != wm.getDesiredMinimumHeight()) {
+            wm.suggestDesiredDimensions(size.x, size.y);
         }
     }
 

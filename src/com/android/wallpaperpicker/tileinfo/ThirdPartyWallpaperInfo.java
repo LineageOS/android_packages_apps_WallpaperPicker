@@ -14,6 +14,7 @@ import android.widget.TextView;
 
 import com.android.wallpaperpicker.R;
 import com.android.wallpaperpicker.WallpaperPickerActivity;
+import com.android.wallpaperpicker.WallpaperUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -35,7 +36,7 @@ public class ThirdPartyWallpaperInfo extends WallpaperTileInfo {
                 mResolveInfo.activityInfo.packageName, mResolveInfo.activityInfo.name);
         Intent launchIntent = new Intent(Intent.ACTION_SET_WALLPAPER)
             .setComponent(itemComponentName)
-            .putExtra(WallpaperPickerActivity.EXTRA_WALLPAPER_OFFSET,
+            .putExtra(WallpaperUtils.EXTRA_WALLPAPER_OFFSET,
                     a.getWallpaperParallaxOffset());
         a.startActivityForResultSafely(
                 launchIntent, WallpaperPickerActivity.PICK_WALLPAPER_THIRD_PARTY_ACTIVITY);
