@@ -21,6 +21,8 @@ import com.android.wallpaperpicker.WallpaperCropActivity.CropViewScaleAndOffsetP
 import com.android.wallpaperpicker.WallpaperFiles;
 import com.android.wallpaperpicker.WallpaperPickerActivity;
 import com.android.wallpaperpicker.common.DialogUtils;
+import com.android.wallpaperpicker.common.Utilities;
+import com.android.wallpaperpicker.common.WallpaperManagerCompat;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,19 +54,30 @@ public class DefaultWallpaperInfo extends DrawableThumbWallpaperInfo {
 
     @Override
     public void onSave(final WallpaperPickerActivity a) {
-        DialogUtils.showWhichWallpaperDialog(a, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                try {
-                    // TODO: Set based on which wallpaper user selected, in WallpaperManagerCompat.
-                    WallpaperManager.getInstance(a.getApplicationContext()).clear();
-                    a.setResult(Activity.RESULT_OK);
-                } catch (IOException e) {
-                    Log.w(TAG, "Setting wallpaper to default threw exception", e);
+        if (Utilities.isAtLeastN()) {
+            DialogUtils.showWhichWallpaperHomeOrBothDialog(a, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int selectedItemIndex) {
+                    int whichWallpaper = WallpaperManagerCompat.FLAG_SET_SYSTEM;
+                    if (selectedItemIndex == 1 /* "home screen and lock screen" */) {
+                        whichWallpaper |= WallpaperManagerCompat.FLAG_SET_LOCK;
+                    }
+                    clearWallpaperAndFinish(a, whichWallpaper);
                 }
-                a.finish();
-            }
-        });
+            });
+        } else {
+            clearWallpaperAndFinish(a, WallpaperManagerCompat.FLAG_SET_SYSTEM);
+        }
+    }
+
+    private void clearWallpaperAndFinish(WallpaperPickerActivity a, int whichWallpaper) {
+        try {
+            WallpaperManagerCompat.getInstance(a.getApplicationContext()).clear(whichWallpaper);
+            a.setResult(Activity.RESULT_OK);
+        } catch (IOException e) {
+            Log.w(TAG, "Setting wallpaper to default threw exception", e);
+        }
+        a.finish();
     }
 
     @Override
