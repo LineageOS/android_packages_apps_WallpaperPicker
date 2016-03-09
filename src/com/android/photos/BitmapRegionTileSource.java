@@ -30,15 +30,14 @@ import android.opengl.GLUtils;
 import android.os.Build;
 import android.util.Log;
 
-import com.android.gallery3d.common.BitmapUtils;
 import com.android.gallery3d.common.ExifOrientation;
 import com.android.gallery3d.common.Utils;
 import com.android.gallery3d.glrenderer.BasicTexture;
 import com.android.gallery3d.glrenderer.BitmapTexture;
 import com.android.photos.views.TiledImageRenderer;
+import com.android.wallpaperpicker.common.InputStreamProvider;
 
-import java.io.BufferedInputStream;
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -53,19 +52,7 @@ class SimpleBitmapRegionDecoderWrapper implements SimpleBitmapRegionDecoder {
     private SimpleBitmapRegionDecoderWrapper(BitmapRegionDecoder decoder) {
         mDecoder = decoder;
     }
-    public static SimpleBitmapRegionDecoderWrapper newInstance(
-            String pathName, boolean isShareable) {
-        try {
-            BitmapRegionDecoder d = BitmapRegionDecoder.newInstance(pathName, isShareable);
-            if (d != null) {
-                return new SimpleBitmapRegionDecoderWrapper(d);
-            }
-        } catch (IOException e) {
-            Log.w("BitmapRegionTileSource", "getting decoder failed for path " + pathName, e);
-            return null;
-        }
-        return null;
-    }
+
     public static SimpleBitmapRegionDecoderWrapper newInstance(
             InputStream is, boolean isShareable) {
         try {
@@ -96,13 +83,6 @@ class DumbBitmapRegionDecoder implements SimpleBitmapRegionDecoder {
     Paint mTempPaint;
     private DumbBitmapRegionDecoder(Bitmap b) {
         mBuffer = b;
-    }
-    public static DumbBitmapRegionDecoder newInstance(String pathName) {
-        Bitmap b = BitmapFactory.decodeFile(pathName);
-        if (b != null) {
-            return new DumbBitmapRegionDecoder(b);
-        }
-        return null;
     }
     public static DumbBitmapRegionDecoder newInstance(InputStream is) {
         Bitmap b = BitmapFactory.decodeStream(is);
@@ -175,7 +155,7 @@ public class BitmapRegionTileSource implements TiledImageRenderer.TileSource {
                 opts.inPreferQualityOverSpeed = true;
 
                 float scale = (float) MAX_PREVIEW_SIZE / Math.max(width, height);
-                opts.inSampleSize = BitmapUtils.computeSampleSizeLarger(scale);
+                opts.inSampleSize = Utils.computeSampleSizeLarger(scale);
                 opts.inJustDecodeBounds = false;
                 opts.inMutable = true;
 
@@ -240,114 +220,71 @@ public class BitmapRegionTileSource implements TiledImageRenderer.TileSource {
         }
     }
 
-    public static class FilePathBitmapSource extends BitmapSource {
-        private String mPath;
-        public FilePathBitmapSource(String path) {
-            mPath = path;
+    public static class InputStreamSource extends BitmapSource {
+        private final InputStreamProvider mStreamProvider;
+        private final Context mContext;
+
+        public InputStreamSource(Context context, Uri uri) {
+            this(InputStreamProvider.fromUri(context, uri), context);
         }
+
+        public InputStreamSource(Resources res, int resId, Context context) {
+            this(InputStreamProvider.fromResource(res, resId), context);
+        }
+
+        public InputStreamSource(InputStreamProvider streamProvider, Context context) {
+            mStreamProvider = streamProvider;
+            mContext = context;
+        }
+
         @Override
         public SimpleBitmapRegionDecoder loadBitmapRegionDecoder() {
-            SimpleBitmapRegionDecoder d;
-            d = SimpleBitmapRegionDecoderWrapper.newInstance(mPath, true);
-            if (d == null) {
-                d = DumbBitmapRegionDecoder.newInstance(mPath);
+            try {
+                InputStream is = mStreamProvider.newStreamNotNull();
+                SimpleBitmapRegionDecoder regionDecoder =
+                        SimpleBitmapRegionDecoderWrapper.newInstance(is, false);
+                Utils.closeSilently(is);
+                if (regionDecoder == null) {
+                    is = mStreamProvider.newStreamNotNull();
+                    regionDecoder = DumbBitmapRegionDecoder.newInstance(is);
+                    Utils.closeSilently(is);
+                }
+                return regionDecoder;
+            } catch (IOException e) {
+                Log.e("InputStreamSource", "Failed to load stream", e);
+                return null;
             }
-            return d;
         }
+
+        @Override
+        public int getExifRotation() {
+            return mStreamProvider.getRotationFromExif(mContext);
+        }
+
         @Override
         public Bitmap loadPreviewBitmap(BitmapFactory.Options options) {
-            return BitmapFactory.decodeFile(mPath, options);
+            try {
+                InputStream is = mStreamProvider.newStreamNotNull();
+                Bitmap b = BitmapFactory.decodeStream(is, null, options);
+                Utils.closeSilently(is);
+                return b;
+            } catch (IOException | OutOfMemoryError e) {
+                Log.e("InputStreamSource", "Failed to load stream", e);
+                return null;
+            }
+        }
+    }
+
+    public static class FilePathBitmapSource extends InputStreamSource {
+        private String mPath;
+        public FilePathBitmapSource(File file, Context context) {
+            super(context, Uri.fromFile(file));
+            mPath = file.getAbsolutePath();
         }
 
         @Override
         public int getExifRotation() {
             return ExifOrientation.readRotation(mPath);
-        }
-    }
-
-    public static class UriBitmapSource extends BitmapSource {
-        private Context mContext;
-        private Uri mUri;
-        public UriBitmapSource(Context context, Uri uri) {
-            mContext = context;
-            mUri = uri;
-        }
-        private InputStream regenerateInputStream() throws FileNotFoundException {
-            InputStream is = mContext.getContentResolver().openInputStream(mUri);
-            return new BufferedInputStream(is);
-        }
-        @Override
-        public SimpleBitmapRegionDecoder loadBitmapRegionDecoder() {
-            try {
-                InputStream is = regenerateInputStream();
-                SimpleBitmapRegionDecoder regionDecoder =
-                        SimpleBitmapRegionDecoderWrapper.newInstance(is, false);
-                Utils.closeSilently(is);
-                if (regionDecoder == null) {
-                    is = regenerateInputStream();
-                    regionDecoder = DumbBitmapRegionDecoder.newInstance(is);
-                    Utils.closeSilently(is);
-                }
-                return regionDecoder;
-            } catch (FileNotFoundException e) {
-                Log.e("BitmapRegionTileSource", "Failed to load URI " + mUri, e);
-                return null;
-            }
-        }
-        @Override
-        public Bitmap loadPreviewBitmap(BitmapFactory.Options options) {
-            try {
-                InputStream is = regenerateInputStream();
-                Bitmap b = BitmapFactory.decodeStream(is, null, options);
-                Utils.closeSilently(is);
-                return b;
-            } catch (FileNotFoundException | OutOfMemoryError e) {
-                Log.e("BitmapRegionTileSource", "Failed to load URI " + mUri, e);
-                return null;
-            }
-        }
-
-        @Override
-        public int getExifRotation() {
-            return BitmapUtils.getRotationFromExif(mContext, mUri);
-        }
-    }
-
-    public static class ResourceBitmapSource extends BitmapSource {
-        private Resources mRes;
-        private int mResId;
-        private Context mContext;
-
-        public ResourceBitmapSource(Resources res, int resId, Context context) {
-            mRes = res;
-            mResId = resId;
-            mContext = context;
-        }
-        private InputStream regenerateInputStream() {
-            InputStream is = mRes.openRawResource(mResId);
-            return new BufferedInputStream(is);
-        }
-        @Override
-        public SimpleBitmapRegionDecoder loadBitmapRegionDecoder() {
-            InputStream is = regenerateInputStream();
-            SimpleBitmapRegionDecoder regionDecoder =
-                    SimpleBitmapRegionDecoderWrapper.newInstance(is, false);
-            Utils.closeSilently(is);
-            if (regionDecoder == null) {
-                is = regenerateInputStream();
-                regionDecoder = DumbBitmapRegionDecoder.newInstance(is);
-                Utils.closeSilently(is);
-            }
-            return regionDecoder;
-        }
-        @Override
-        public Bitmap loadPreviewBitmap(BitmapFactory.Options options) {
-            return BitmapFactory.decodeResource(mRes, mResId, options);
-        }
-
-        @Override
-        public int getExifRotation() {
-            return BitmapUtils.getRotationFromExif(mRes, mResId, mContext);
         }
     }
 

@@ -6,15 +6,14 @@ import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.RectF;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.android.gallery3d.common.BitmapCropTask;
 import com.android.gallery3d.common.Utils;
 import com.android.wallpaperpicker.R;
 import com.android.wallpaperpicker.WallpaperPickerActivity;
+import com.android.wallpaperpicker.common.InputStreamProvider;
 
 public abstract class WallpaperTileInfo {
 
@@ -44,25 +43,13 @@ public abstract class WallpaperTileInfo {
 
     }
 
-    protected static Bitmap createThumbnail(Context context, Uri uri, byte[] imageBytes,
-            Resources res, int resId, int rotation, boolean leftAligned) {
+    protected static Bitmap createThumbnail(InputStreamProvider streamProvider, Context context,
+            int rotation, boolean leftAligned) {
         Point size = getDefaultThumbSize(context.getResources());
         int width = size.x;
         int height = size.y;
-
-        BitmapCropTask cropTask;
-        if (uri != null) {
-            cropTask = new BitmapCropTask(
-                    context, uri, null, rotation, width, height, false, true, null);
-        } else if (imageBytes != null) {
-            cropTask = new BitmapCropTask(
-                    imageBytes, null, rotation, width, height, false, true, null);
-        }  else {
-            cropTask = new BitmapCropTask(
-                    context, res, resId, null, rotation, width, height, false, true, null);
-        }
-        Point bounds = cropTask.getImageBounds();
-        if (bounds == null || bounds.x == 0 || bounds.y == 0) {
+        Point bounds = streamProvider.getImageBounds();
+        if (bounds == null) {
             return null;
         }
 
@@ -75,12 +62,6 @@ public abstract class WallpaperTileInfo {
 
         RectF cropRect = Utils.getMaxCropRect(
                 (int) rotatedBounds[0], (int) rotatedBounds[1], width, height, leftAligned);
-        cropTask.setCropBounds(cropRect);
-
-        if (cropTask.cropBitmap()) {
-            return cropTask.getCroppedBitmap();
-        } else {
-            return null;
-        }
+        return streamProvider.readCroppedBitmap(cropRect, width, height, rotation);
     }
 }

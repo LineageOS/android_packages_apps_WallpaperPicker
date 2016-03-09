@@ -24,8 +24,8 @@ public class ResourceWallpaperInfo extends DrawableThumbWallpaperInfo {
     @Override
     public void onClick(final WallpaperPickerActivity a) {
         a.setWallpaperButtonEnabled(false);
-        final BitmapRegionTileSource.ResourceBitmapSource bitmapSource =
-                new BitmapRegionTileSource.ResourceBitmapSource(mResources, mResId, a);
+        final BitmapRegionTileSource.InputStreamSource bitmapSource =
+                new BitmapRegionTileSource.InputStreamSource(mResources, mResId, a);
         a.setCropViewTileSource(bitmapSource, false, false, new CropViewScaleAndOffsetProvider() {
 
             @Override
