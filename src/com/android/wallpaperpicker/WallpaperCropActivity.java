@@ -20,6 +20,7 @@ import android.annotation.TargetApi;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.WallpaperManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.res.Resources;
@@ -68,6 +69,14 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
     // A weak-set of reusable bitmaps
     private Set<Bitmap> mReusableBitmaps =
             Collections.newSetFromMap(new WeakHashMap<Bitmap, Boolean>());
+
+    private final DialogInterface.OnCancelListener mOnDialogCancelListener =
+            new DialogInterface.OnCancelListener() {
+                @Override
+                public void onCancel(DialogInterface dialog) {
+                    showActionBarAndTiles();
+                }
+            };
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -243,6 +252,18 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
         }
     }
 
+    public DialogInterface.OnCancelListener getOnDialogCancelListener() {
+        return mOnDialogCancelListener;
+    }
+
+    private void showActionBarAndTiles() {
+        getActionBar().show();
+        View wallpaperStrip = findViewById(R.id.wallpaper_strip);
+        if (wallpaperStrip != null) {
+            wallpaperStrip.setVisibility(View.VISIBLE);
+        }
+    }
+
     protected void onLoadRequestComplete(LoadRequest req, boolean success) {
         mCurrentLoadRequest = null;
         if (success) {
@@ -325,16 +346,13 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
         CropAndSetWallpaperTask cropTask = new CropAndSetWallpaperTask(
                 streamProvider, this, crop, streamProvider.getRotationFromExif(this),
                 outSize.x, outSize.y, onEndCrop);
-        DialogUtils.executeCropTaskAfterPrompt(this, cropTask);
+        DialogUtils.executeCropTaskAfterPrompt(this, cropTask, getOnDialogCancelListener());
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     public void cropImageAndSetWallpaper(Uri uri,
             CropAndSetWallpaperTask.OnBitmapCroppedHandler onBitmapCroppedHandler,
             boolean shouldFadeOutOnFinish) {
-        // Give some feedback so user knows something is happening.
-        mProgressView.setVisibility(View.VISIBLE);
-
         // Get the crop
         boolean ltr = mCropView.getLayoutDirection() == View.LAYOUT_DIRECTION_LTR;
 
@@ -402,11 +420,17 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
 
         CropAndSetWallpaperTask cropTask = new CropAndSetWallpaperTask(
                 InputStreamProvider.fromUri(this, uri), this,
-                cropRect, cropRotation, outWidth, outHeight, onEndCrop);
+                cropRect, cropRotation, outWidth, outHeight, onEndCrop) {
+            @Override
+            protected void onPreExecute() {
+                // Give some feedback so user knows something is happening.
+                mProgressView.setVisibility(View.VISIBLE);
+            }
+        };
         if (onBitmapCroppedHandler != null) {
             cropTask.setOnBitmapCropped(onBitmapCroppedHandler);
         }
-        DialogUtils.executeCropTaskAfterPrompt(this, cropTask);
+        DialogUtils.executeCropTaskAfterPrompt(this, cropTask, getOnDialogCancelListener());
     }
 
     public void setBoundsAndFinish(Point bounds, boolean overrideTransition) {

@@ -18,11 +18,12 @@ public class DialogUtils {
      * Note: This method must be called from the UI thread.
      */
     public static void showWhichWallpaperDialog(Context context,
-            DialogInterface.OnClickListener onClickListener) {
+            DialogInterface.OnClickListener onClickListener,
+            DialogInterface.OnCancelListener onCancelListener) {
         new AlertDialog.Builder(context)
                 .setTitle(R.string.which_wallpaper_title)
-                .setCancelable(false)
                 .setItems(R.array.which_wallpaper_options, onClickListener)
+                .setOnCancelListener(onCancelListener)
                 .show();
     }
 
@@ -33,11 +34,12 @@ public class DialogUtils {
      * Note: This method must be called from the UI thread.
      */
     public static void showWhichWallpaperHomeOrBothDialog(Context context,
-            DialogInterface.OnClickListener onClickListener) {
+            DialogInterface.OnClickListener onClickListener,
+            DialogInterface.OnCancelListener onCancelListener) {
         new AlertDialog.Builder(context)
                 .setTitle(R.string.which_wallpaper_title)
-                .setCancelable(false)
                 .setItems(R.array.which_wallpaper_options_home_or_both, onClickListener)
+                .setOnCancelListener(onCancelListener)
                 .show();
     }
 
@@ -48,7 +50,8 @@ public class DialogUtils {
      * TODO: Don't use CropAndSetWallpaperTask on N+, because the new API will handle cropping instead.
      */
     public static void executeCropTaskAfterPrompt(
-            Context context, final AsyncTask<Integer, ?, ?> cropTask) {
+            Context context, final AsyncTask<Integer, ?, ?> cropTask,
+            DialogInterface.OnCancelListener onCancelListener) {
         if (Utilities.isAtLeastN()) {
             showWhichWallpaperDialog(context, new DialogInterface.OnClickListener() {
                 @Override
@@ -64,7 +67,7 @@ public class DialogUtils {
                     }
                     cropTask.execute(whichWallpaper);
                 }
-            });
+            }, onCancelListener);
         } else {
             cropTask.execute(WallpaperManagerCompat.FLAG_SET_SYSTEM);
         }
