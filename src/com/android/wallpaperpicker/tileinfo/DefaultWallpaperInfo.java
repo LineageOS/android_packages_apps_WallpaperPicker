@@ -4,7 +4,6 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -19,11 +18,13 @@ import android.util.Log;
 import com.android.wallpaperpicker.WallpaperCropActivity.CropViewScaleAndOffsetProvider;
 import com.android.wallpaperpicker.WallpaperFiles;
 import com.android.wallpaperpicker.WallpaperPickerActivity;
+import com.android.wallpaperpicker.common.CropAndSetWallpaperTask;
 import com.android.wallpaperpicker.common.DialogUtils;
 import com.android.wallpaperpicker.common.InputStreamProvider;
-import com.android.wallpaperpicker.common.Utilities;
 import com.android.wallpaperpicker.common.WallpaperManagerCompat;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -54,30 +55,69 @@ public class DefaultWallpaperInfo extends DrawableThumbWallpaperInfo {
 
     @Override
     public void onSave(final WallpaperPickerActivity a) {
-        if (Utilities.isAtLeastN()) {
-            DialogUtils.showWhichWallpaperHomeOrBothDialog(a, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int selectedItemIndex) {
-                    int whichWallpaper = WallpaperManagerCompat.FLAG_SET_SYSTEM;
-                    if (selectedItemIndex == 1 /* "home screen and lock screen" */) {
-                        whichWallpaper |= WallpaperManagerCompat.FLAG_SET_LOCK;
-                    }
-                    clearWallpaperAndFinish(a, whichWallpaper);
+        CropAndSetWallpaperTask.OnEndCropHandler onEndCropHandler
+                = new CropAndSetWallpaperTask.OnEndCropHandler() {
+            @Override
+            public void run(boolean cropSucceeded) {
+                if (cropSucceeded) {
+                    a.setResult(Activity.RESULT_OK);
                 }
-            }, a.getOnDialogCancelListener());
-        } else {
-            clearWallpaperAndFinish(a, WallpaperManagerCompat.FLAG_SET_SYSTEM);
-        }
+                a.finish();
+            }
+        };
+        CropAndSetWallpaperTask setWallpaperTask = new CropAndSetWallpaperTask(
+                null, a, null, -1, -1, -1, onEndCropHandler) {
+            @Override
+            protected Boolean doInBackground(Integer... params) {
+                int whichWallpaper = params[0];
+                boolean succeeded;
+                if (whichWallpaper == WallpaperManagerCompat.FLAG_SET_LOCK) {
+                    succeeded = setDefaultOnLock(a);
+                } else {
+                    succeeded = clearWallpaper(a, whichWallpaper);
+                }
+                return succeeded;
+            }
+        };
+
+        DialogUtils.executeCropTaskAfterPrompt(a, setWallpaperTask, a.getOnDialogCancelListener());
     }
 
-    private void clearWallpaperAndFinish(WallpaperPickerActivity a, int whichWallpaper) {
+    //TODO: @TargetApi(Build.VERSION_CODES.N)
+    private boolean setDefaultOnLock(WallpaperPickerActivity a) {
+        boolean succeeded = true;
         try {
-            WallpaperManagerCompat.getInstance(a.getApplicationContext()).clear(whichWallpaper);
-            a.setResult(Activity.RESULT_OK);
+            Bitmap defaultWallpaper = ((BitmapDrawable) WallpaperManager.getInstance(
+                    a.getApplicationContext()).getBuiltInDrawable()).getBitmap();
+            ByteArrayOutputStream tmpOut = new ByteArrayOutputStream(2048);
+            if (defaultWallpaper.compress(Bitmap.CompressFormat.PNG, 100, tmpOut)) {
+                byte[] outByteArray = tmpOut.toByteArray();
+                WallpaperManagerCompat.getInstance(a.getApplicationContext())
+                        .setStream(new ByteArrayInputStream(outByteArray), null,
+                                true, WallpaperManagerCompat.FLAG_SET_LOCK);
+            }
         } catch (IOException e) {
             Log.w(TAG, "Setting wallpaper to default threw exception", e);
+            succeeded = false;
         }
-        a.finish();
+        return succeeded;
+    }
+
+    private boolean clearWallpaper(WallpaperPickerActivity a, int whichWallpaper) {
+        boolean succeeded = true;
+        try {
+            WallpaperManagerCompat.getInstance(a.getApplicationContext()).clear(whichWallpaper);
+        } catch (IOException e) {
+            Log.w(TAG, "Setting wallpaper to default threw exception", e);
+            succeeded = false;
+        } catch (SecurityException e) {
+            // Happens on Samsung S6, for instance:
+            // "Permission denial: writing to settings requires android.permission.WRITE_SETTINGS"
+            Log.w(TAG, "Setting wallpaper to default threw exception", e);
+            // In this case, clearing worked even though the exception was thrown afterwards.
+            succeeded = true;
+        }
+        return succeeded;
     }
 
     @Override
