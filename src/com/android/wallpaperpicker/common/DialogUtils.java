@@ -21,7 +21,7 @@ public class DialogUtils {
             DialogInterface.OnClickListener onClickListener,
             DialogInterface.OnCancelListener onCancelListener) {
         new AlertDialog.Builder(context)
-                .setTitle(R.string.which_wallpaper_title)
+                .setTitle(R.string.wallpaper_instructions)
                 .setItems(R.array.which_wallpaper_options, onClickListener)
                 .setOnCancelListener(onCancelListener)
                 .show();
@@ -37,7 +37,7 @@ public class DialogUtils {
             DialogInterface.OnClickListener onClickListener,
             DialogInterface.OnCancelListener onCancelListener) {
         new AlertDialog.Builder(context)
-                .setTitle(R.string.which_wallpaper_title)
+                .setTitle(R.string.wallpaper_instructions)
                 .setItems(R.array.which_wallpaper_options_home_or_both, onClickListener)
                 .setOnCancelListener(onCancelListener)
                 .show();
