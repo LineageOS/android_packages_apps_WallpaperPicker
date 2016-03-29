@@ -202,7 +202,7 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
                 new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Ensure that a tile is slelected and loaded.
+                        // Ensure that a tile is selected and loaded.
                         if (mSelectedTile != null && mCropView.getTileSource() != null) {
                             // Prevent user from selecting any new tile.
                             mWallpaperStrip.setVisibility(View.GONE);
@@ -211,9 +211,9 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
                             WallpaperTileInfo info = (WallpaperTileInfo) mSelectedTile.getTag();
                             info.onSave(WallpaperPickerActivity.this);
                         } else {
-                            // no tile was selected, so we just finish the activity and go back
-                            setResult(Activity.RESULT_OK);
-                            finish();
+                            // This case shouldn't be possible, since "Set wallpaper" is disabled
+                            // until user clicks on a title.
+                            Log.w(TAG, "\"Set wallpaper\" was clicked when no tile was selected");
                         }
                     }
                 });
@@ -232,10 +232,10 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
             }
             return;
         }
-        setWallpaperButtonEnabled(true);
         WallpaperTileInfo info = (WallpaperTileInfo) v.getTag();
         if (info.isSelectable() && v.getVisibility() == View.VISIBLE) {
             selectTile(v);
+            setWallpaperButtonEnabled(true);
         }
         info.onClick(this);
     }
