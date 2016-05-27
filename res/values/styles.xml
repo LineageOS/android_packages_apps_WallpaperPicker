@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 /*
+<<<<<<< HEAD
 * Copyright (C) 2013 The Android Open Source Project
+=======
+* Copyright (C) 2016 The CyanogenMod Project
+>>>>>>> 7d22895... CMWallpapers: Add a set wallpaper button for nowallpaper
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -38,5 +42,10 @@
     <style name="ActionBarSetWallpaperStyle" parent="@android:style/Widget.DeviceDefault.ActionButton">
         <item name="android:textColor">#ffffffff</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
+    <style name="Preview" parent="android:Theme.Holo">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Activity</item>
     </style>
 </resources>
