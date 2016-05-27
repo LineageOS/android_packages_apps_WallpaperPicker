@@ -38,7 +38,9 @@
 
         <activity
             android:name="com.android.wallpaperpicker.NoWallpaper"
-            android:label="@string/no_wallpaper">
+            android:theme="@style/WallpaperTheme.Picker"
+            android:label="@string/no_wallpaper"
+            android:icon="@drawable/nowallpaper_icon">
             <intent-filter>
                 <action android:name="android.intent.action.SET_WALLPAPER" />
                 <category android:name="android.intent.category.DEFAULT" />
