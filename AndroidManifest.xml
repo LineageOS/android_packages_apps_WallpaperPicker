@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+        package="org.cyanogenmod.wallpaperpicker"
+        android:versionCode="1"
+        android:versionName="1.0"
+        >
+
+    <uses-sdk android:minSdkVersion="23" android:targetSdkVersion="23" />
+
+    <!-- Permissions for setting the wallpaper -->
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER_HINTS" />
+    <!-- Permissions for setting lock screen wallpaper -->
+    <uses-permission android:name="android.permission.SET_KEYGUARD_WALLPAPER" />
+    <!-- Permissions for setting images from external storage as wallpaper -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- Permissions for reading themes -->
+    <uses-permission android:name="cyanogenmod.permission.READ_THEMES" />
+
+    <application
+        android:label="@string/app_name"
+        android:restoreAnyVersion="true"
+        android:supportsRtl="true"
+        android:icon="@mipmap/ic_launcher_wallpaper">
+
+        <activity
+                android:name="org.cyanogenmod.wallpaperpicker.WallpaperPickerActivity"
+                android:theme="@style/Theme.WallpaperPicker"
+                android:label="@string/pick_wallpaper"
+                android:icon="@mipmap/ic_launcher_wallpaper"
+                android:finishOnCloseSystemDialogs="true">
+            <intent-filter>
+                <action android:name="android.intent.action.SET_WALLPAPER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SET_KEYGUARD_WALLPAPER" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+                android:name="org.cyanogenmod.wallpaperpicker.WallpaperCropActivity"
+                android:theme="@style/Theme.WallpaperCropper"
+                android:label="@string/crop_wallpaper"
+                android:icon="@mipmap/ic_launcher_wallpaper"
+                android:finishOnCloseSystemDialogs="true">
+            <intent-filter>
+                <action android:name="android.service.wallpaper.CROP_AND_SET_WALLPAPER" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity>
+
+    </application>
+</manifest>
