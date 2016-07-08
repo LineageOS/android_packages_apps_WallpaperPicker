@@ -60,8 +60,6 @@ import java.util.WeakHashMap;
 public class WallpaperCropActivity extends BaseActivity implements Handler.Callback {
     private static final String LOGTAG = "CropActivity";
 
-    private static final int REQUEST_CODE_STORAGE_PERMISSION_CHECK = 100;
-
     protected static final String WALLPAPER_WIDTH_KEY = WallpaperUtils.WALLPAPER_WIDTH_KEY;
     protected static final String WALLPAPER_HEIGHT_KEY = WallpaperUtils.WALLPAPER_HEIGHT_KEY;
 
@@ -94,32 +92,7 @@ public class WallpaperCropActivity extends BaseActivity implements Handler.Callb
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (!hasStoragePermissions()) {
-            requestStoragePermissions();
-        } else {
-           load();
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            int[] grantResults) {
-        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION_CHECK) {
-            for (int i = 0; i < permissions.length; i++ ) {
-                final String permission = permissions[i];
-                final int grantResult = grantResults[i];
-                if (permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
-                       load();
-                    } else {
-                        Toast.makeText(this, getString(R.string.storage_permission_denied),
-                                Toast.LENGTH_SHORT).show();
-                        finish();
-                    }
-                }
-            }
-        }
+        load();
     }
 
     private void load() {
@@ -512,16 +485,6 @@ public class WallpaperCropActivity extends BaseActivity implements Handler.Callb
         editor.commit();
         WallpaperUtils.suggestWallpaperDimension(getResources(),
                 sp, getWindowManager(), WallpaperManager.getInstance(getContext()), true);
-    }
-
-    private boolean hasStoragePermissions() {
-        return checkCallingOrSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) ==
-                PackageManager.PERMISSION_GRANTED;
-    }
-
-    private void requestStoragePermissions() {
-        requestPermissions(new String[] {android.Manifest.permission.READ_EXTERNAL_STORAGE},
-                REQUEST_CODE_STORAGE_PERMISSION_CHECK);
     }
 
     static class LoadRequest {

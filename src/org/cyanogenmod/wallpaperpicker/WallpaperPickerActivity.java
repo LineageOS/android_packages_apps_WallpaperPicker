@@ -104,6 +104,8 @@ public class WallpaperPickerActivity extends WallpaperCropActivity {
     private static final String ACTION_SET_KEYGUARD_WALLPAPER =
             "android.intent.action.SET_KEYGUARD_WALLPAPER";
 
+    private static final int REQUEST_CODE_STORAGE_PERMISSION_CHECK = 100;
+
     @Thunk
     View mSelectedTile;
     @Thunk boolean mIgnoreNextTap;
@@ -147,9 +149,11 @@ public class WallpaperPickerActivity extends WallpaperCropActivity {
     public static class PickImageInfo extends WallpaperTileInfo {
         @Override
         public void onClick(WallpaperPickerActivity a) {
-            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-            intent.setType("image/*");
-            a.startActivityForResultSafely(intent, IMAGE_PICK);
+            if (a.hasStoragePermissions()) {
+                a.startPickImageActivity();
+            } else {
+                a.requestStoragePermissions();
+            }
         }
     }
 
@@ -508,6 +512,30 @@ public class WallpaperPickerActivity extends WallpaperCropActivity {
         super.onLoadRequestComplete(req, success);
         if (success) {
             setSystemWallpaperVisiblity(false);
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            int[] grantResults) {
+        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION_CHECK) {
+            for (int i = 0; i < permissions.length; i++ ) {
+                final String permission = permissions[i];
+                final int grantResult = grantResults[i];
+                if (permission.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+                    if (grantResult == PackageManager.PERMISSION_GRANTED) {
+                        startPickImageActivity();
+                    } else {
+                        Toast.makeText(this, getString(R.string.storage_permission_denied),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }
         }
     }
 
@@ -1376,6 +1404,22 @@ public class WallpaperPickerActivity extends WallpaperCropActivity {
 
     public void startActivityForResultSafely(Intent intent, int requestCode) {
         Utilities.startActivityForResultSafely(getActivity(), intent, requestCode);
+    }
+
+    public void startPickImageActivity() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        startActivityForResultSafely(intent, IMAGE_PICK);
+    }
+
+    public boolean hasStoragePermissions() {
+        return checkCallingOrSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) ==
+                PackageManager.PERMISSION_GRANTED;
+    }
+
+    public void requestStoragePermissions() {
+        requestPermissions(new String[] {android.Manifest.permission.READ_EXTERNAL_STORAGE},
+                REQUEST_CODE_STORAGE_PERMISSION_CHECK);
     }
 
     private static class ThemeWallpapersAdapter extends BaseAdapter implements ListAdapter {
