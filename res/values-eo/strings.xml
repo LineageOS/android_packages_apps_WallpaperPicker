@@ -33,6 +33,7 @@
          e.g. "Wallpaper 3 of 10" -->
   <!-- Accessibility string used to announce that a wallpaper has been selected. -->
   <!-- Label on button to delete wallpaper(s) -->
+  <string name="wallpaper_delete">Forigi</string>
   <!-- Label on button in Wallpaper Picker to pick an image -->
   <!-- Option in "Select wallpaper from" dialog box -->
   <!-- Title of activity for cropping wallpapers -->
