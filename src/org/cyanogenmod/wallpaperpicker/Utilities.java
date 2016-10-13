@@ -26,20 +26,15 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
-import android.content.res.AssetManager;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.DisplayMetrics;
@@ -49,14 +44,15 @@ import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Toast;
-import org.cyanogenmod.wallpaperpicker.util.WallpaperUtils;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,9 +61,7 @@ import java.util.regex.Pattern;
  */
 public final class Utilities {
 
-    private static final String TAG = "WallpaperPicker.Utilities";
-
-    private static final float WALLPAPER_SCREENS_SPAN = 2f;
+    private static final String TAG = "Launcher.Utilities";
 
     private static final Rect sOldBounds = new Rect();
     private static final Canvas sCanvas = new Canvas();
@@ -85,8 +79,11 @@ public final class Utilities {
     private static final int[] sLoc0 = new int[2];
     private static final int[] sLoc1 = new int[2];
 
-    // TODO: use Build.VERSION_CODES when available
-    public static final boolean ATLEAST_MARSHMALLOW = Build.VERSION.SDK_INT >= 23;
+    // TODO: use the full N name (e.g. ATLEAST_N*****) when available
+    public static final boolean ATLEAST_N = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
+
+    public static final boolean ATLEAST_MARSHMALLOW =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
 
     public static final boolean ATLEAST_LOLLIPOP_MR1 =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1;
@@ -103,10 +100,17 @@ public final class Utilities {
     public static final boolean ATLEAST_JB_MR2 =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
 
-    // To turn on these properties, type
-    // adb shell setprop log.tag.PROPERTY_NAME [VERBOSE | SUPPRESS]
-    private static final String FORCE_ENABLE_ROTATION_PROPERTY = "launcher_force_rotate";
-    private static boolean sForceEnableRotation = isPropertyEnabled(FORCE_ENABLE_ROTATION_PROPERTY);
+    // These values are same as that in {@link AsyncTask}.
+    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    private static final int CORE_POOL_SIZE = CPU_COUNT + 1;
+    private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1;
+    private static final int KEEP_ALIVE = 1;
+    /**
+     * An {@link Executor} to be used with async task with no limit on the queue size.
+     */
+    public static final Executor THREAD_POOL_EXECUTOR = new ThreadPoolExecutor(
+            CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
+            TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
     public static boolean isPropertyEnabled(String propertyName) {
         return Log.isLoggable(propertyName, Log.VERBOSE);
@@ -159,28 +163,17 @@ public final class Utilities {
         r.offset(cx, cy);
     }
 
-    static boolean isSystemApp(Context context, Intent intent) {
-        PackageManager pm = context.getPackageManager();
-        ComponentName cn = intent.getComponent();
-        String packageName = null;
-        if (cn == null) {
-            ResolveInfo info = pm.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
-            if ((info != null) && (info.activityInfo != null)) {
-                packageName = info.activityInfo.packageName;
-            }
-        } else {
-            packageName = cn.getPackageName();
-        }
-        if (packageName != null) {
-            try {
-                PackageInfo info = pm.getPackageInfo(packageName, 0);
-                return (info != null) && (info.applicationInfo != null) &&
-                        ((info.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
-            } catch (NameNotFoundException e) {
-                return false;
-            }
-        } else {
-            return false;
+    public static void startActivityForResultSafely(
+            Activity activity, Intent intent, int requestCode) {
+        try {
+            activity.startActivityForResult(intent, requestCode);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
+        } catch (SecurityException e) {
+            Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Launcher does not have the permission to launch " + intent +
+                    ". Make sure to create a MAIN intent-filter for the corresponding activity " +
+                    "or use the exported attribute for this activity.", e);
         }
     }
 
@@ -453,7 +446,8 @@ public final class Utilities {
     }
 
     public static float dpiFromPx(int size, DisplayMetrics metrics){
-        return (size / metrics.density);
+        float densityRatio = (float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT;
+        return (size / densityRatio);
     }
     public static int pxFromDp(float size, DisplayMetrics metrics) {
         return (int) Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -462,88 +456,5 @@ public final class Utilities {
     public static int pxFromSp(float size, DisplayMetrics metrics) {
         return (int) Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP,
                 size, metrics));
-    }
-
-    public static boolean isPackageInstalled(Context context, String pkg) {
-        PackageManager packageManager = context.getPackageManager();
-        try {
-            PackageInfo pi = packageManager.getPackageInfo(pkg, 0);
-            return pi.applicationInfo.enabled;
-        } catch (NameNotFoundException e) {
-            return false;
-        }
-    }
-
-    public static void startActivityForResultSafely(
-            Activity activity, Intent intent, int requestCode) {
-        try {
-            activity.startActivityForResult(intent, requestCode);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
-        } catch (SecurityException e) {
-            Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Wallpaper picker does not have the permission to launch " + intent +
-                    ". Make sure to create a MAIN intent-filter for the corresponding activity " +
-                    "or use the exported attribute for this activity.", e);
-        }
-    }
-
-    public static Bitmap getThemeWallpaper(Context context, String path, String pkgName,
-            boolean thumb) {
-        InputStream is = null;
-        try {
-            Resources res = context.getPackageManager().getResourcesForApplication(pkgName);
-            if (res == null) {
-                return null;
-            }
-
-            AssetManager am = res.getAssets();
-            String[] wallpapers = am.list(path);
-            if (wallpapers == null || wallpapers.length == 0) {
-                return null;
-            }
-            is = am.open(path + File.separator + wallpapers[0]);
-
-            BitmapFactory.Options bounds = new BitmapFactory.Options();
-            bounds.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(is, null, bounds);
-            if ((bounds.outWidth == -1) || (bounds.outHeight == -1))
-                return null;
-
-            int originalSize = (bounds.outHeight > bounds.outWidth) ? bounds.outHeight
-                    : bounds.outWidth;
-            Point outSize;
-
-            if (thumb) {
-                outSize = getDefaultThumbnailSize(context.getResources());
-            } else {
-                outSize = WallpaperUtils.getDefaultWallpaperSize(res,
-                        ((Activity) context).getWindowManager());
-            }
-            int thumbSampleSize = (outSize.y > outSize.x) ? outSize.y : outSize.x;
-
-            BitmapFactory.Options opts = new BitmapFactory.Options();
-            opts.inSampleSize = originalSize / thumbSampleSize;
-            return BitmapFactory.decodeStream(is, null, opts);
-        } catch (IOException e) {
-            return null;
-        } catch (PackageManager.NameNotFoundException e) {
-            return null;
-        } catch (OutOfMemoryError e) {
-            return null;
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                }
-            }
-        }
-    }
-
-    public static Point getDefaultThumbnailSize(Resources res) {
-        return new Point(res.getDimensionPixelSize(R.dimen.wallpaperThumbnailWidth),
-                res.getDimensionPixelSize(R.dimen.wallpaperThumbnailHeight));
-
     }
 }

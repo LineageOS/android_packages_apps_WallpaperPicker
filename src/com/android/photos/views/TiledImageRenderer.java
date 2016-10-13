@@ -32,7 +32,6 @@ import com.android.gallery3d.common.Utils;
 import com.android.gallery3d.glrenderer.BasicTexture;
 import com.android.gallery3d.glrenderer.GLCanvas;
 import com.android.gallery3d.glrenderer.UploadedTexture;
-
 import org.cyanogenmod.wallpaperpicker.util.Thunk;
 
 /**
@@ -69,8 +68,7 @@ public class TiledImageRenderer {
     private static final int STATE_RECYCLING = 0x20;
     private static final int STATE_RECYCLED = 0x40;
 
-    @Thunk
-    static Pool<Bitmap> sTilePool = new SynchronizedPool<Bitmap>(64);
+    @Thunk static Pool<Bitmap> sTilePool = new SynchronizedPool<Bitmap>(64);
 
     // TILE_SIZE must be 2^N
     @Thunk int mTileSize;
