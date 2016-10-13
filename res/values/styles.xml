@@ -24,7 +24,7 @@
         <item name="android:windowActionBarOverlay">true</item>
     </style>
 
-    <style name="Theme.WallpaperPicker" parent="@style/Theme.WallpaperCropper">
+    <style name="Theme.WallpaperPicker" parent="Theme.WallpaperCropper">
         <item name="android:windowBackground">@android:color/transparent</item>
         <item name="android:colorBackgroundCacheHint">@null</item>
         <item name="android:windowShowWallpaper">true</item>
