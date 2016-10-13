@@ -35,6 +35,7 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import org.cyanogenmod.wallpaperpicker.util.Thunk;
+
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
@@ -50,8 +51,7 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
     private final LayoutInflater mInflater;
     private final PackageManager mPackageManager;
 
-    @Thunk
-    List<LiveWallpaperTile> mWallpapers;
+    @Thunk List<LiveWallpaperTile> mWallpapers;
 
     @SuppressWarnings("unchecked")
     public LiveWallpaperListAdapter(Context context) {

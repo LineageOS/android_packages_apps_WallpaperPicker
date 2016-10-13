@@ -19,29 +19,40 @@ package org.cyanogenmod.wallpaperpicker;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.SearchManager;
+import android.app.WallpaperManager;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProviderInfo;
 import android.content.ActivityNotFoundException;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
-import android.content.res.AssetManager;
-import android.content.res.Configuration;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
-import android.graphics.Point;
 import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.PaintDrawable;
 import android.os.Build;
+import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.Process;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.TextUtils;
+import android.text.style.TtsSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Pair;
@@ -49,14 +60,16 @@ import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.Toast;
-import org.cyanogenmod.wallpaperpicker.util.WallpaperUtils;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -65,9 +78,7 @@ import java.util.regex.Pattern;
  */
 public final class Utilities {
 
-    private static final String TAG = "WallpaperPicker.Utilities";
-
-    private static final float WALLPAPER_SCREENS_SPAN = 2f;
+    private static final String TAG = "Launcher.Utilities";
 
     private static final Rect sOldBounds = new Rect();
     private static final Canvas sCanvas = new Canvas();
@@ -85,8 +96,11 @@ public final class Utilities {
     private static final int[] sLoc0 = new int[2];
     private static final int[] sLoc1 = new int[2];
 
-    // TODO: use Build.VERSION_CODES when available
-    public static final boolean ATLEAST_MARSHMALLOW = Build.VERSION.SDK_INT >= 23;
+    // TODO: use the full N name (e.g. ATLEAST_N*****) when available
+    public static final boolean ATLEAST_N = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N;
+
+    public static final boolean ATLEAST_MARSHMALLOW =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
 
     public static final boolean ATLEAST_LOLLIPOP_MR1 =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1;
@@ -103,13 +117,108 @@ public final class Utilities {
     public static final boolean ATLEAST_JB_MR2 =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
 
-    // To turn on these properties, type
-    // adb shell setprop log.tag.PROPERTY_NAME [VERBOSE | SUPPRESS]
-    private static final String FORCE_ENABLE_ROTATION_PROPERTY = "launcher_force_rotate";
-    private static boolean sForceEnableRotation = isPropertyEnabled(FORCE_ENABLE_ROTATION_PROPERTY);
+    // These values are same as that in {@link AsyncTask}.
+    private static final int CPU_COUNT = Runtime.getRuntime().availableProcessors();
+    private static final int CORE_POOL_SIZE = CPU_COUNT + 1;
+    private static final int MAXIMUM_POOL_SIZE = CPU_COUNT * 2 + 1;
+    private static final int KEEP_ALIVE = 1;
+    /**
+     * An {@link Executor} to be used with async task with no limit on the queue size.
+     */
+    public static final Executor THREAD_POOL_EXECUTOR = new ThreadPoolExecutor(
+            CORE_POOL_SIZE, MAXIMUM_POOL_SIZE, KEEP_ALIVE,
+            TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
     public static boolean isPropertyEnabled(String propertyName) {
         return Log.isLoggable(propertyName, Log.VERBOSE);
+    }
+
+    /**
+     * Given a coordinate relative to the descendant, find the coordinate in a parent view's
+     * coordinates.
+     *
+     * @param descendant The descendant to which the passed coordinate is relative.
+     * @param root The root view to make the coordinates relative to.
+     * @param coord The coordinate that we want mapped.
+     * @param includeRootScroll Whether or not to account for the scroll of the descendant:
+     *          sometimes this is relevant as in a child's coordinates within the descendant.
+     * @return The factor by which this descendant is scaled relative to this DragLayer. Caution
+     *         this scale factor is assumed to be equal in X and Y, and so if at any point this
+     *         assumption fails, we will need to return a pair of scale factors.
+     */
+    public static float getDescendantCoordRelativeToParent(View descendant, View root,
+                                                           int[] coord, boolean includeRootScroll) {
+        ArrayList<View> ancestorChain = new ArrayList<View>();
+
+        float[] pt = {coord[0], coord[1]};
+
+        View v = descendant;
+        while(v != root && v != null) {
+            ancestorChain.add(v);
+            v = (View) v.getParent();
+        }
+        ancestorChain.add(root);
+
+        float scale = 1.0f;
+        int count = ancestorChain.size();
+        for (int i = 0; i < count; i++) {
+            View v0 = ancestorChain.get(i);
+            // For TextViews, scroll has a meaning which relates to the text position
+            // which is very strange... ignore the scroll.
+            if (v0 != descendant || includeRootScroll) {
+                pt[0] -= v0.getScrollX();
+                pt[1] -= v0.getScrollY();
+            }
+
+            v0.getMatrix().mapPoints(pt);
+            pt[0] += v0.getLeft();
+            pt[1] += v0.getTop();
+            scale *= v0.getScaleX();
+        }
+
+        coord[0] = (int) Math.round(pt[0]);
+        coord[1] = (int) Math.round(pt[1]);
+        return scale;
+    }
+
+    /**
+     * Inverse of {@link #getDescendantCoordRelativeToParent(View, View, int[], boolean)}.
+     */
+    public static float mapCoordInSelfToDescendent(View descendant, View root,
+                                                   int[] coord) {
+        ArrayList<View> ancestorChain = new ArrayList<View>();
+
+        float[] pt = {coord[0], coord[1]};
+
+        View v = descendant;
+        while(v != root) {
+            ancestorChain.add(v);
+            v = (View) v.getParent();
+        }
+        ancestorChain.add(root);
+
+        float scale = 1.0f;
+        Matrix inverse = new Matrix();
+        int count = ancestorChain.size();
+        for (int i = count - 1; i >= 0; i--) {
+            View ancestor = ancestorChain.get(i);
+            View next = i > 0 ? ancestorChain.get(i-1) : null;
+
+            pt[0] += ancestor.getScrollX();
+            pt[1] += ancestor.getScrollY();
+
+            if (next != null) {
+                pt[0] -= next.getLeft();
+                pt[1] -= next.getTop();
+                next.getMatrix().invert(inverse);
+                inverse.mapPoints(pt);
+                scale *= next.getScaleX();
+            }
+        }
+
+        coord[0] = (int) Math.round(pt[0]);
+        coord[1] = (int) Math.round(pt[1]);
+        return scale;
     }
 
     /**
@@ -159,28 +268,17 @@ public final class Utilities {
         r.offset(cx, cy);
     }
 
-    static boolean isSystemApp(Context context, Intent intent) {
-        PackageManager pm = context.getPackageManager();
-        ComponentName cn = intent.getComponent();
-        String packageName = null;
-        if (cn == null) {
-            ResolveInfo info = pm.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY);
-            if ((info != null) && (info.activityInfo != null)) {
-                packageName = info.activityInfo.packageName;
-            }
-        } else {
-            packageName = cn.getPackageName();
-        }
-        if (packageName != null) {
-            try {
-                PackageInfo info = pm.getPackageInfo(packageName, 0);
-                return (info != null) && (info.applicationInfo != null) &&
-                        ((info.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
-            } catch (NameNotFoundException e) {
-                return false;
-            }
-        } else {
-            return false;
+    public static void startActivityForResultSafely(
+            Activity activity, Intent intent, int requestCode) {
+        try {
+            activity.startActivityForResult(intent, requestCode);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
+        } catch (SecurityException e) {
+            Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Launcher does not have the permission to launch " + intent +
+                    ". Make sure to create a MAIN intent-filter for the corresponding activity " +
+                    "or use the exported attribute for this activity.", e);
         }
     }
 
@@ -293,29 +391,6 @@ public final class Utilities {
             // A proxy call which returns null, if the view is not attached to the window.
             return v.getKeyDispatcherState() != null;
         }
-    }
-
-    /*
-     * Finds all system apks which had a broadcast receiver listening to a particular action.
-     * @param action intent action used to find the apk
-     * @return a list of pairs of apk package name and the resources.
-     */
-    static List<Pair<String, Resources>> findSystemApks(String action, PackageManager pm) {
-        final Intent intent = new Intent(action);
-        List<Pair<String, Resources>> systemApks = new ArrayList<Pair<String, Resources>>();
-        for (ResolveInfo info : pm.queryBroadcastReceivers(intent, 0)) {
-            if (info.activityInfo != null &&
-                    (info.activityInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
-                final String packageName = info.activityInfo.packageName;
-                try {
-                    final Resources res = pm.getResourcesForApplication(packageName);
-                    systemApks.add(Pair.create(packageName, res));
-                } catch (NameNotFoundException e) {
-                    Log.w(TAG, "Failed to find resources for " + packageName);
-                }
-            }
-        }
-        return systemApks;
     }
 
     /**
@@ -453,7 +528,8 @@ public final class Utilities {
     }
 
     public static float dpiFromPx(int size, DisplayMetrics metrics){
-        return (size / metrics.density);
+        float densityRatio = (float) metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT;
+        return (size / densityRatio);
     }
     public static int pxFromDp(float size, DisplayMetrics metrics) {
         return (int) Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
@@ -464,86 +540,61 @@ public final class Utilities {
                 size, metrics));
     }
 
-    public static boolean isPackageInstalled(Context context, String pkg) {
-        PackageManager packageManager = context.getPackageManager();
-        try {
-            PackageInfo pi = packageManager.getPackageInfo(pkg, 0);
-            return pi.applicationInfo.enabled;
-        } catch (NameNotFoundException e) {
-            return false;
+    public static String createDbSelectionQuery(String columnName, Iterable<?> values) {
+        return String.format(Locale.ENGLISH, "%s IN (%s)", columnName, TextUtils.join(", ", values));
+    }
+
+    /**
+     * Wraps a message with a TTS span, so that a different message is spoken than
+     * what is getting displayed.
+     * @param msg original message
+     * @param ttsMsg message to be spoken
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    public static CharSequence wrapForTts(CharSequence msg, String ttsMsg) {
+        if (Utilities.ATLEAST_LOLLIPOP) {
+            SpannableString spanned = new SpannableString(msg);
+            spanned.setSpan(new TtsSpan.TextBuilder(ttsMsg).build(),
+                    0, spanned.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+            return spanned;
+        } else {
+            return msg;
         }
     }
 
-    public static void startActivityForResultSafely(
-            Activity activity, Intent intent, int requestCode) {
-        try {
-            activity.startActivityForResult(intent, requestCode);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
-        } catch (SecurityException e) {
-            Toast.makeText(activity, R.string.activity_not_found, Toast.LENGTH_SHORT).show();
-            Log.e(TAG, "Wallpaper picker does not have the permission to launch " + intent +
-                    ". Make sure to create a MAIN intent-filter for the corresponding activity " +
-                    "or use the exported attribute for this activity.", e);
-        }
+    /**
+     * Replacement for Long.compare() which was added in API level 19.
+     */
+    public static int longCompare(long lhs, long rhs) {
+        return lhs < rhs ? -1 : (lhs == rhs ? 0 : 1);
     }
 
-    public static Bitmap getThemeWallpaper(Context context, String path, String pkgName,
-            boolean thumb) {
-        InputStream is = null;
-        try {
-            Resources res = context.getPackageManager().getResourcesForApplication(pkgName);
-            if (res == null) {
-                return null;
-            }
-
-            AssetManager am = res.getAssets();
-            String[] wallpapers = am.list(path);
-            if (wallpapers == null || wallpapers.length == 0) {
-                return null;
-            }
-            is = am.open(path + File.separator + wallpapers[0]);
-
-            BitmapFactory.Options bounds = new BitmapFactory.Options();
-            bounds.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(is, null, bounds);
-            if ((bounds.outWidth == -1) || (bounds.outHeight == -1))
-                return null;
-
-            int originalSize = (bounds.outHeight > bounds.outWidth) ? bounds.outHeight
-                    : bounds.outWidth;
-            Point outSize;
-
-            if (thumb) {
-                outSize = getDefaultThumbnailSize(context.getResources());
-            } else {
-                outSize = WallpaperUtils.getDefaultWallpaperSize(res,
-                        ((Activity) context).getWindowManager());
-            }
-            int thumbSampleSize = (outSize.y > outSize.x) ? outSize.y : outSize.x;
-
-            BitmapFactory.Options opts = new BitmapFactory.Options();
-            opts.inSampleSize = originalSize / thumbSampleSize;
-            return BitmapFactory.decodeStream(is, null, opts);
-        } catch (IOException e) {
-            return null;
-        } catch (PackageManager.NameNotFoundException e) {
-            return null;
-        } catch (OutOfMemoryError e) {
-            return null;
-        } finally {
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                }
-            }
+    public static boolean isWallapaperAllowed(Context context) {
+        if (ATLEAST_N) {
+            return context.getSystemService(WallpaperManager.class).isSetWallpaperAllowed();
         }
+        return true;
     }
 
-    public static Point getDefaultThumbnailSize(Resources res) {
-        return new Point(res.getDimensionPixelSize(R.dimen.wallpaperThumbnailWidth),
-                res.getDimensionPixelSize(R.dimen.wallpaperThumbnailHeight));
+    /**
+     * An extension of {@link BitmapDrawable} which returns the bitmap pixel size as intrinsic size.
+     * This allows the badging to be done based on the action bitmap size rather than
+     * the scaled bitmap size.
+     */
+    private static class FixedSizeBitmapDrawable extends BitmapDrawable {
 
+        public FixedSizeBitmapDrawable(Bitmap bitmap) {
+            super(null, bitmap);
+        }
+
+        @Override
+        public int getIntrinsicHeight() {
+            return getBitmap().getWidth();
+        }
+
+        @Override
+        public int getIntrinsicWidth() {
+            return getBitmap().getWidth();
+        }
     }
 }

@@ -18,7 +18,6 @@ package com.android.photos;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -39,8 +38,6 @@ import com.android.gallery3d.glrenderer.BitmapTexture;
 import com.android.photos.views.TiledImageRenderer;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -114,12 +111,6 @@ class DumbBitmapRegionDecoder implements SimpleBitmapRegionDecoder {
         }
         return null;
     }
-    public static DumbBitmapRegionDecoder newInstance(Bitmap src) {
-        if (src != null) {
-            return new DumbBitmapRegionDecoder(src);
-        }
-        return null;
-    }
     public int getWidth() {
         return mBuffer.getWidth();
     }
@@ -168,6 +159,7 @@ public class BitmapRegionTileSource implements TiledImageRenderer.TileSource {
         public enum State { NOT_LOADED, LOADED, ERROR_LOADING };
         private State mState = State.NOT_LOADED;
 
+        /** Returns whether loading was successful. */
         public boolean loadInBackground(InBitmapProvider bitmapProvider) {
             ExifInterface ei = new ExifInterface();
             if (readExif(ei)) {
@@ -202,7 +194,7 @@ public class BitmapRegionTileSource implements TiledImageRenderer.TileSource {
                         try {
                             mPreview = loadPreviewBitmap(opts);
                         } catch (IllegalArgumentException e) {
-                            Log.d(TAG, "Unable to reusage bitmap", e);
+                            Log.d(TAG, "Unable to reuse bitmap", e);
                             opts.inBitmap = null;
                             mPreview = null;
                         }
@@ -210,6 +202,10 @@ public class BitmapRegionTileSource implements TiledImageRenderer.TileSource {
                 }
                 if (mPreview == null) {
                     mPreview = loadPreviewBitmap(opts);
+                }
+                if (mPreview == null) {
+                    mState = State.ERROR_LOADING;
+                    return false;
                 }
 
                 // Verify that the bitmap can be used on GL surface
@@ -221,7 +217,7 @@ public class BitmapRegionTileSource implements TiledImageRenderer.TileSource {
                     Log.d(TAG, "Image cannot be rendered on a GL surface", e);
                     mState = State.ERROR_LOADING;
                 }
-                return true;
+                return mState == State.LOADED;
             }
         }
 
@@ -319,7 +315,7 @@ public class BitmapRegionTileSource implements TiledImageRenderer.TileSource {
                 Bitmap b = BitmapFactory.decodeStream(is, null, options);
                 Utils.closeSilently(is);
                 return b;
-            } catch (FileNotFoundException e) {
+            } catch (FileNotFoundException | OutOfMemoryError e) {
                 Log.e("BitmapRegionTileSource", "Failed to load URI " + mUri, e);
                 return null;
             }
@@ -389,85 +385,6 @@ public class BitmapRegionTileSource implements TiledImageRenderer.TileSource {
         }
     }
 
-    public static class ThemeBitmapSource extends BitmapSource {
-        private AssetManager mAssets;
-        private String mPath;
-        public ThemeBitmapSource(AssetManager assets, String path) {
-            mAssets = assets;
-            mPath = path;
-        }
-        private InputStream regenerateInputStream() {
-            String[] pathImages = new String[0];
-            try {
-                pathImages = mAssets.list(mPath);
-                if (pathImages == null || pathImages.length == 0) {
-                    Log.d(TAG, "did not find any images in path: " + mPath);
-                    return null;
-                }
-                InputStream is = mAssets.open(mPath + File.separator + pathImages[0]);
-                return new BufferedInputStream(is);
-            } catch (IOException e) {
-                return null;
-            }
-        }
-        @Override
-        public SimpleBitmapRegionDecoder loadBitmapRegionDecoder() {
-            InputStream is = regenerateInputStream();
-            SimpleBitmapRegionDecoder regionDecoder =
-                    SimpleBitmapRegionDecoderWrapper.newInstance(is, false);
-            Utils.closeSilently(is);
-            if (regionDecoder == null) {
-                is = regenerateInputStream();
-                regionDecoder = DumbBitmapRegionDecoder.newInstance(is);
-                Utils.closeSilently(is);
-            }
-            return regionDecoder;
-        }
-        @Override
-        public Bitmap loadPreviewBitmap(BitmapFactory.Options options) {
-            InputStream is = regenerateInputStream();
-            return is != null ? BitmapFactory.decodeStream(is, null, options) : null;
-        }
-        @Override
-        public boolean readExif(ExifInterface ei) {
-            try {
-                InputStream is = regenerateInputStream();
-                ei.readExif(is);
-                Utils.closeSilently(is);
-                return true;
-            } catch (IOException e) {
-                Log.e("BitmapRegionTileSource", "Error reading resource", e);
-                return false;
-            }
-        }
-    }
-
-    public static class DumbBitmapSource extends BitmapSource {
-        Bitmap mSource;
-        public DumbBitmapSource(Bitmap source) {
-            mSource = source;
-        }
-        @Override
-        public SimpleBitmapRegionDecoder loadBitmapRegionDecoder() {
-            return DumbBitmapRegionDecoder.newInstance(mSource);
-        }
-        @Override
-        public Bitmap loadPreviewBitmap(BitmapFactory.Options options) {
-            // We need to honor the options being passed in so that an appropriate bitmap, for use
-            // as a texture, is returned so we need to encode the bitmap using compress and then
-            // decode the compressed image's bytes using the provided options.
-            // JPEG is used instead of PNG as it was encoding much faster.
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            mSource.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-            byte[] bytes = stream.toByteArray();
-            return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-        }
-        @Override
-        public boolean readExif(ExifInterface ei) {
-            return false;
-        }
-    }
-
     SimpleBitmapRegionDecoder mDecoder;
     int mWidth;
     int mHeight;
@@ -500,7 +417,8 @@ public class BitmapRegionTileSource implements TiledImageRenderer.TileSource {
                         "Failed to create preview of apropriate size! "
                         + " in: %dx%d, out: %dx%d",
                         mWidth, mHeight,
-                        preview.getWidth(), preview.getHeight()));
+                        preview == null ? -1 : preview.getWidth(),
+                        preview == null ? -1 : preview.getHeight()));
             }
         }
     }

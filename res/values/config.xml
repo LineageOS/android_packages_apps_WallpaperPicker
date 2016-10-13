@@ -17,4 +17,6 @@
     <!-- Specifies whether to expand the cropped area on both sides (rather
          than just to one side) -->
     <bool name="center_crop">false</bool>
+
+    <bool name="allow_rotation">true</bool>
 </resources>

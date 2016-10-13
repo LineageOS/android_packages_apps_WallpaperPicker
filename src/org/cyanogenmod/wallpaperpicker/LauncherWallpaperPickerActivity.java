@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 The CyanogenMod Project
+ * Copyright (C) 2013 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package org.cyanogenmod.wallpaperpicker.util;
+package org.cyanogenmod.wallpaperpicker;
 
-public class Constants {
-
-    public static final String THEME_WALLPAPER_PATH = "wallpapers";
-    public static final String THEME_LOCKSCREEN_PATH = "lockscreen";
-
+// TODO: Remove this class
+public class LauncherWallpaperPickerActivity extends WallpaperPickerActivity {
 }

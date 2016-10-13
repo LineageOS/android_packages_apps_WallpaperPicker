@@ -18,11 +18,11 @@ package org.cyanogenmod.wallpaperpicker;
 
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.Pair;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Utilities to discover and interact with partner customizations. There can
@@ -39,38 +39,33 @@ public class Partner {
 
     public static final String RES_FOLDER = "partner_folder";
     public static final String RES_WALLPAPERS = "partner_wallpapers";
+    public static final String RES_DEFAULT_LAYOUT = "partner_default_layout";
 
     public static final String RES_DEFAULT_WALLPAPER_HIDDEN = "default_wallpapper_hidden";
     public static final String RES_SYSTEM_WALLPAPER_DIR = "system_wallpaper_directory";
 
-    private static boolean sSearched = false;
-    private static List<Partner> sPartners;
+    public static final String RES_REQUIRE_FIRST_RUN_FLOW = "requires_first_run_flow";
 
-    static {
-        sPartners = new ArrayList<Partner>();
-    }
+    /** These resources are used to override the device profile  */
+    public static final String RES_GRID_NUM_ROWS = "grid_num_rows";
+    public static final String RES_GRID_NUM_COLUMNS = "grid_num_columns";
+    public static final String RES_GRID_ICON_SIZE_DP = "grid_icon_size_dp";
+
+    private static boolean sSearched = false;
+    private static Partner sPartner;
 
     /**
-     * Find and return first partner details, or {@code null} if none exists.
+     * Find and return partner details, or {@code null} if none exists.
      */
     public static synchronized Partner get(PackageManager pm) {
-        getAllPartners(pm);
-        return sPartners.size() > 0 ? sPartners.get(0) : null;
-    }
-
-    /**
-     * Find and return all partner details, or {@code null} if none exists.
-     */
-    public static synchronized List<Partner> getAllPartners(PackageManager pm) {
         if (!sSearched) {
-            List<Pair<String, Resources>> apkInfos =
-                    Utilities.findSystemApks(ACTION_PARTNER_CUSTOMIZATION, pm);
-            for (Pair<String, Resources> apkInfo : apkInfos) {
-                sPartners.add(new Partner(apkInfo.first, apkInfo.second));
+            Pair<String, Resources> apkInfo = Utilities.findSystemApk(ACTION_PARTNER_CUSTOMIZATION, pm);
+            if (apkInfo != null) {
+                sPartner = new Partner(apkInfo.first, apkInfo.second);
             }
             sSearched = true;
         }
-        return sPartners;
+        return sPartner;
     }
 
     private final String mPackageName;
@@ -89,6 +84,12 @@ public class Partner {
         return mResources;
     }
 
+    public boolean hasDefaultLayout() {
+        int defaultLayout = getResources().getIdentifier(Partner.RES_DEFAULT_LAYOUT,
+                "xml", getPackageName());
+        return defaultLayout != 0;
+    }
+
     public boolean hasFolder() {
         int folder = getResources().getIdentifier(Partner.RES_FOLDER,
                 "xml", getPackageName());
@@ -105,5 +106,11 @@ public class Partner {
         int resId = getResources().getIdentifier(RES_SYSTEM_WALLPAPER_DIR, "string",
                 getPackageName());
         return (resId != 0) ? new File(getResources().getString(resId)) : null;
+    }
+
+    public boolean requiresFirstRunFlow() {
+        int resId = getResources().getIdentifier(RES_REQUIRE_FIRST_RUN_FLOW, "bool",
+                getPackageName());
+        return resId != 0 && getResources().getBoolean(resId);
     }
 }

@@ -83,8 +83,7 @@ public abstract class UploadedTexture extends BasicTexture {
         return mIsUploading;
     }
 
-    @Thunk
-    static class BorderKey implements Cloneable {
+    @Thunk static class BorderKey implements Cloneable {
         public boolean vertical;
         public Config config;
         public int length;
