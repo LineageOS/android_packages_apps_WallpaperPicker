@@ -54,5 +54,4 @@
   <string name="storage_permission_denied">Nun pue accedese al almacenamientu</string>
   <!-- Displayed when user selects a shortcut for an app that was uninstalled [CHAR_LIMIT=none]-->
   <string name="activity_not_found">L\'aplicación nun ta instalada.</string>
-  <string name="no_wallpaper">Ensin fondu de pantalla</string>
 </resources>

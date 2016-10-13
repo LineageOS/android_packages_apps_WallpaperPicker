@@ -39,9 +39,17 @@ public class Partner {
 
     public static final String RES_FOLDER = "partner_folder";
     public static final String RES_WALLPAPERS = "partner_wallpapers";
+    public static final String RES_DEFAULT_LAYOUT = "partner_default_layout";
 
     public static final String RES_DEFAULT_WALLPAPER_HIDDEN = "default_wallpapper_hidden";
     public static final String RES_SYSTEM_WALLPAPER_DIR = "system_wallpaper_directory";
+
+    public static final String RES_REQUIRE_FIRST_RUN_FLOW = "requires_first_run_flow";
+
+    /** These resources are used to override the device profile  */
+    public static final String RES_GRID_NUM_ROWS = "grid_num_rows";
+    public static final String RES_GRID_NUM_COLUMNS = "grid_num_columns";
+    public static final String RES_GRID_ICON_SIZE_DP = "grid_icon_size_dp";
 
     private static boolean sSearched = false;
     private static List<Partner> sPartners;
@@ -73,6 +81,7 @@ public class Partner {
         return sPartners;
     }
 
+
     private final String mPackageName;
     private final Resources mResources;
 
@@ -87,6 +96,12 @@ public class Partner {
 
     public Resources getResources() {
         return mResources;
+    }
+
+    public boolean hasDefaultLayout() {
+        int defaultLayout = getResources().getIdentifier(Partner.RES_DEFAULT_LAYOUT,
+                "xml", getPackageName());
+        return defaultLayout != 0;
     }
 
     public boolean hasFolder() {
@@ -105,5 +120,11 @@ public class Partner {
         int resId = getResources().getIdentifier(RES_SYSTEM_WALLPAPER_DIR, "string",
                 getPackageName());
         return (resId != 0) ? new File(getResources().getString(resId)) : null;
+    }
+
+    public boolean requiresFirstRunFlow() {
+        int resId = getResources().getIdentifier(RES_REQUIRE_FIRST_RUN_FLOW, "bool",
+                getPackageName());
+        return resId != 0 && getResources().getBoolean(resId);
     }
 }

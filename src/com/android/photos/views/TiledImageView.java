@@ -33,9 +33,8 @@ import android.widget.FrameLayout;
 
 import com.android.gallery3d.glrenderer.BasicTexture;
 import com.android.gallery3d.glrenderer.GLES20Canvas;
-import com.android.photos.views.TiledImageRenderer.TileSource;
-
 import org.cyanogenmod.wallpaperpicker.util.Thunk;
+import com.android.photos.views.TiledImageRenderer.TileSource;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -45,8 +44,7 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class TiledImageView extends FrameLayout {
 
-    @Thunk
-    GLSurfaceView mGLSurfaceView;
+    @Thunk GLSurfaceView mGLSurfaceView;
     @Thunk boolean mInvalPending = false;
     private FrameCallback mFrameCallback;
 
