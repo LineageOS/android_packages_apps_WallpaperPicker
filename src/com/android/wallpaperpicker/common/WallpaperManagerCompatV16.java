@@ -16,7 +16,12 @@ public class WallpaperManagerCompatV16 extends WallpaperManagerCompat {
 
     @Override
     public void setStream(InputStream data, Rect visibleCropHint, boolean allowBackup,
-            int which) throws IOException {
+            int whichWallpaper) throws IOException {
         mWallpaperManager.setStream(data);
+    }
+
+    @Override
+    public void clear(int whichWallpaper) throws IOException {
+        mWallpaperManager.clear();
     }
 }

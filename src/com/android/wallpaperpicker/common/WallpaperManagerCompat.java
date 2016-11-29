@@ -27,5 +27,7 @@ public abstract class WallpaperManagerCompat {
     }
 
     public abstract void setStream(InputStream stream, Rect visibleCropHint, boolean allowBackup,
-            int which) throws IOException;
+            int whichWallpaper) throws IOException;
+
+    public abstract void clear(int whichWallpaper) throws IOException;
 }
