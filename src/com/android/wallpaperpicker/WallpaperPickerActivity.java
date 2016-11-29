@@ -14,19 +14,15 @@
  * limitations under the License.
  */
 
-package com.android.launcher3;
+package com.android.wallpaperpicker;
 
 import android.animation.LayoutTransition;
-import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -35,7 +31,6 @@ import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLayoutChangeListener;
@@ -47,17 +42,14 @@ import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
-import com.android.launcher3.util.Thunk;
-import com.android.launcher3.wallpapertileinfo.DefaultWallpaperInfo;
-import com.android.launcher3.wallpapertileinfo.FileWallpaperInfo;
-import com.android.launcher3.wallpapertileinfo.LiveWallpaperInfo;
-import com.android.launcher3.wallpapertileinfo.PickImageInfo;
-import com.android.launcher3.wallpapertileinfo.ResourceWallpaperInfo;
-import com.android.launcher3.wallpapertileinfo.ThirdPartyWallpaperInfo;
-import com.android.launcher3.wallpapertileinfo.UriWallpaperInfo;
-import com.android.launcher3.wallpapertileinfo.WallpaperTileInfo;
+import com.android.wallpaperpicker.tileinfo.DefaultWallpaperInfo;
+import com.android.wallpaperpicker.tileinfo.LiveWallpaperInfo;
+import com.android.wallpaperpicker.tileinfo.PickImageInfo;
+import com.android.wallpaperpicker.tileinfo.ResourceWallpaperInfo;
+import com.android.wallpaperpicker.tileinfo.ThirdPartyWallpaperInfo;
+import com.android.wallpaperpicker.tileinfo.UriWallpaperInfo;
+import com.android.wallpaperpicker.tileinfo.WallpaperTileInfo;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,18 +65,17 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
     private static final String SELECTED_INDEX = "SELECTED_INDEX";
     private static final int FLAG_POST_DELAY_MILLIS = 200;
 
-    @Thunk
-    View mSelectedTile;
+    private View mSelectedTile;
 
-    @Thunk LinearLayout mWallpapersView;
-    @Thunk HorizontalScrollView mWallpaperScrollContainer;
-    @Thunk View mWallpaperStrip;
+    private LinearLayout mWallpapersView;
+    private HorizontalScrollView mWallpaperScrollContainer;
+    private View mWallpaperStrip;
 
-    @Thunk ActionMode mActionMode;
+    private ActionMode mActionMode;
 
     ArrayList<Uri> mTempWallpaperTiles = new ArrayList<Uri>();
     private SavedWallpaperImages mSavedImages;
-    @Thunk int mSelectedIndex = -1;
+    private int mSelectedIndex = -1;
     private float mWallpaperParallaxOffset;
 
     /**
@@ -112,7 +103,7 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
         }, FLAG_POST_DELAY_MILLIS);
     }
 
-    @Thunk void changeWallpaperFlags(boolean visible) {
+    private void changeWallpaperFlags(boolean visible) {
         int desiredWallpaperFlag = visible ? WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER : 0;
         int currentWallpaperFlag = getWindow().getAttributes().flags
                 & WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER;
@@ -148,7 +139,7 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
 
         mWallpapersView = (LinearLayout) findViewById(R.id.wallpaper_list);
         // Populate the saved wallpapers
-        mSavedImages = new SavedWallpaperImages(getContext());
+        mSavedImages = new SavedWallpaperImages(this);
         populateWallpapers(mWallpapersView, mSavedImages.loadThumbnailsAndImageIdList(), true);
 
         // Populate the built-in wallpapers
@@ -290,11 +281,11 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
         // TODO: Remove this once the accessibility framework and
         // services have better support for selection state.
         v.announceForAccessibility(
-                getContext().getString(R.string.announce_selection, v.getContentDescription()));
+            getString(R.string.announce_selection, v.getContentDescription()));
     }
 
-    @Thunk void initializeScrollForRtl() {
-        if (Utilities.isRtl(getResources())) {
+    private void initializeScrollForRtl() {
+        if (WallpaperUtils.isRtl(getResources())) {
             final ViewTreeObserver observer = mWallpaperScrollContainer.getViewTreeObserver();
             observer.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
                 public void onGlobalLayout() {
@@ -329,7 +320,7 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
         mSelectedIndex = savedInstanceState.getInt(SELECTED_INDEX, -1);
     }
 
-    @Thunk void updateTileIndices() {
+    private void updateTileIndices() {
         LinearLayout masterWallpaperList = (LinearLayout) findViewById(R.id.master_wallpaper_list);
         final int childCount = masterWallpaperList.getChildCount();
         final Resources res = getResources();
@@ -403,7 +394,7 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
         }
     }
 
-    @Thunk void populateWallpapers(ViewGroup parent, List<? extends WallpaperTileInfo> wallpapers,
+    private void populateWallpapers(ViewGroup parent, List<? extends WallpaperTileInfo> wallpapers,
             boolean addLongPressHandler) {
         for (WallpaperTileInfo info : wallpapers) {
             parent.addView(createTileView(parent, info, addLongPressHandler));
@@ -416,17 +407,6 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
 
         if (addLongPress) {
             view.setOnLongClickListener(this);
-
-            // Enable stylus button to also trigger long click.
-            final StylusEventHelper stylusEventHelper =
-                    new StylusEventHelper(new SimpleOnStylusPressListener(view), view);
-            view.setOnTouchListener(new View.OnTouchListener() {
-                @SuppressLint("ClickableViewAccessibility")
-                @Override
-                public boolean onTouch(View view, MotionEvent event) {
-                    return stylusEventHelper.onMotionEvent(event);
-                }
-            });
         }
         view.setOnClickListener(this);
         return view;
@@ -446,81 +426,27 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
         }
     }
 
-    private ArrayList<WallpaperTileInfo> findBundledWallpapers() {
-        final PackageManager pm = getContext().getPackageManager();
+    public ArrayList<WallpaperTileInfo> findBundledWallpapers() {
         final ArrayList<WallpaperTileInfo> bundled = new ArrayList<WallpaperTileInfo>(24);
-
-        Partner partner = Partner.get(pm);
-        if (partner != null) {
-            final Resources partnerRes = partner.getResources();
-            final int resId = partnerRes.getIdentifier(Partner.RES_WALLPAPERS, "array",
-                    partner.getPackageName());
-            if (resId != 0) {
-                addWallpapers(bundled, partnerRes, partner.getPackageName(), resId);
-            }
-
-            // Add system wallpapers
-            File systemDir = partner.getWallpaperDirectory();
-            if (systemDir != null && systemDir.isDirectory()) {
-                for (File file : systemDir.listFiles()) {
-                    if (!file.isFile()) {
-                        continue;
-                    }
-                    String name = file.getName();
-                    int dotPos = name.lastIndexOf('.');
-                    String extension = "";
-                    if (dotPos >= -1) {
-                        extension = name.substring(dotPos);
-                        name = name.substring(0, dotPos);
-                    }
-
-                    if (name.endsWith("_small")) {
-                        // it is a thumbnail
-                        continue;
-                    }
-
-                    File thumbnail = new File(systemDir, name + "_small" + extension);
-                    Bitmap thumb = BitmapFactory.decodeFile(thumbnail.getAbsolutePath());
-                    if (thumb != null) {
-                        bundled.add(new FileWallpaperInfo(
-                                file, new BitmapDrawable(getResources(), thumb)));
-                    }
-                }
-            }
-        }
-
         Pair<ApplicationInfo, Integer> r = getWallpaperArrayResourceId();
         if (r != null) {
             try {
-                Resources wallpaperRes = getContext().getPackageManager()
-                        .getResourcesForApplication(r.first);
+                Resources wallpaperRes = getPackageManager().getResourcesForApplication(r.first);
                 addWallpapers(bundled, wallpaperRes, r.first.packageName, r.second);
             } catch (PackageManager.NameNotFoundException e) {
             }
         }
 
-        if (partner == null || !partner.hideDefaultWallpaper()) {
-            // Add an entry for the default wallpaper (stored in system resources)
-            WallpaperTileInfo defaultWallpaperInfo = DefaultWallpaperInfo.get(this);
-            if (defaultWallpaperInfo != null) {
-                bundled.add(0, defaultWallpaperInfo);
-            }
+        // Add an entry for the default wallpaper (stored in system resources)
+        WallpaperTileInfo defaultWallpaperInfo = DefaultWallpaperInfo.get(this);
+        if (defaultWallpaperInfo != null) {
+            bundled.add(0, defaultWallpaperInfo);
         }
         return bundled;
     }
 
     public Pair<ApplicationInfo, Integer> getWallpaperArrayResourceId() {
-        // Context.getPackageName() may return the "original" package name,
-        // com.android.launcher3; Resources needs the real package name,
-        // com.android.launcher3. So we ask Resources for what it thinks the
-        // package name should be.
-        final String packageName = getResources().getResourcePackageName(R.array.wallpapers);
-        try {
-            ApplicationInfo info = getContext().getPackageManager().getApplicationInfo(packageName, 0);
-            return new Pair<ApplicationInfo, Integer>(info, R.array.wallpapers);
-        } catch (PackageManager.NameNotFoundException e) {
-            return null;
-        }
+        return new Pair<ApplicationInfo, Integer>(getApplicationInfo(), R.array.wallpapers);
     }
 
     private void addWallpapers(ArrayList<WallpaperTileInfo> known, Resources res,
@@ -548,16 +474,7 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
     }
 
     public void startActivityForResultSafely(Intent intent, int requestCode) {
-        Utilities.startActivityForResultSafely(getActivity(), intent, requestCode);
-    }
-
-    @Override
-    public boolean enableRotation() {
-        return super.enableRotation() ||
-                getContentResolver().call(LauncherSettings.Settings.CONTENT_URI,
-                        LauncherSettings.Settings.METHOD_GET_BOOLEAN,
-                        Utilities.ALLOW_ROTATION_PREFERENCE_KEY, new Bundle())
-                .getBoolean(LauncherSettings.Settings.EXTRA_VALUE);
+        startActivityForResult(intent, requestCode);
     }
 
     // CAB for deleting items

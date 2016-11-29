@@ -18,7 +18,7 @@
 */
 -->
 
-<com.android.launcher3.AlphaDisableableButton
+<com.android.wallpaperpicker.AlphaDisableableButton
     xmlns:android="http://schemas.android.com/apk/res/android"
     style="@style/ActionBarSetWallpaperStyle"
     android:id="@+id/set_wallpaper_button"
@@ -28,5 +28,4 @@
     android:drawableLeft="@drawable/ic_actionbar_accept"
     android:drawablePadding="8dp"
     android:gravity="start|center_vertical"
-    android:text="@string/wallpaper_instructions">
-</com.android.launcher3.AlphaDisableableButton>
+    android:text="@string/wallpaper_instructions" />

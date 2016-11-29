@@ -1,4 +1,4 @@
-package com.android.launcher3.wallpapertileinfo;
+package com.android.wallpaperpicker.tileinfo;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -16,10 +16,9 @@ import android.os.Build;
 import android.util.Log;
 
 import com.android.gallery3d.common.BitmapUtils;
-import com.android.launcher3.LauncherFiles;
-import com.android.launcher3.Utilities;
-import com.android.launcher3.WallpaperCropActivity.CropViewScaleAndOffsetProvider;
-import com.android.launcher3.WallpaperPickerActivity;
+import com.android.wallpaperpicker.WallpaperCropActivity.CropViewScaleAndOffsetProvider;
+import com.android.wallpaperpicker.WallpaperFiles;
+import com.android.wallpaperpicker.WallpaperPickerActivity;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,7 +51,7 @@ public class DefaultWallpaperInfo extends DrawableThumbWallpaperInfo {
     @Override
     public void onSave(WallpaperPickerActivity a) {
         try {
-            WallpaperManager.getInstance(a.getContext()).clear();
+            WallpaperManager.getInstance(a).clear();
             a.setResult(Activity.RESULT_OK);
         } catch (IOException e) {
             Log.w(TAG, "Setting wallpaper to default threw exception", e);
@@ -74,7 +73,7 @@ public class DefaultWallpaperInfo extends DrawableThumbWallpaperInfo {
      * @return the system default wallpaper tile or null
      */
     public static WallpaperTileInfo get(Context context) {
-        return Utilities.ATLEAST_KITKAT
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT
                 ? getDefaultWallpaper(context) : getPreKKDefaultWallpaperInfo(context);
     }
 
@@ -137,16 +136,16 @@ public class DefaultWallpaperInfo extends DrawableThumbWallpaperInfo {
 
     private static File getDefaultThumbFile(Context context) {
         return new File(context.getFilesDir(), Build.VERSION.SDK_INT
-                + "_" + LauncherFiles.DEFAULT_WALLPAPER_THUMBNAIL);
+                + "_" + WallpaperFiles.DEFAULT_WALLPAPER_THUMBNAIL);
     }
 
     private static boolean saveDefaultWallpaperThumb(Context c, Bitmap b) {
         // Delete old thumbnails.
-        new File(c.getFilesDir(), LauncherFiles.DEFAULT_WALLPAPER_THUMBNAIL_OLD).delete();
-        new File(c.getFilesDir(), LauncherFiles.DEFAULT_WALLPAPER_THUMBNAIL).delete();
+        new File(c.getFilesDir(), WallpaperFiles.DEFAULT_WALLPAPER_THUMBNAIL_OLD).delete();
+        new File(c.getFilesDir(), WallpaperFiles.DEFAULT_WALLPAPER_THUMBNAIL).delete();
 
         for (int i = Build.VERSION_CODES.JELLY_BEAN; i < Build.VERSION.SDK_INT; i++) {
-            new File(c.getFilesDir(), i + "_" + LauncherFiles.DEFAULT_WALLPAPER_THUMBNAIL).delete();
+            new File(c.getFilesDir(), i + "_" + WallpaperFiles.DEFAULT_WALLPAPER_THUMBNAIL).delete();
         }
         File f = getDefaultThumbFile(c);
         try {

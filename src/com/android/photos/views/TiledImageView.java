@@ -17,8 +17,6 @@
 package com.android.photos.views;
 
 import android.content.Context;
-import android.graphics.Matrix;
-import android.graphics.RectF;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLSurfaceView.Renderer;
 import android.util.AttributeSet;
@@ -28,7 +26,6 @@ import android.widget.FrameLayout;
 
 import com.android.gallery3d.glrenderer.BasicTexture;
 import com.android.gallery3d.glrenderer.GLES20Canvas;
-import com.android.launcher3.util.Thunk;
 import com.android.photos.views.TiledImageRenderer.TileSource;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -39,8 +36,8 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class TiledImageView extends FrameLayout {
 
-    @Thunk GLSurfaceView mGLSurfaceView;
-    @Thunk boolean mInvalPending = false;
+    private GLSurfaceView mGLSurfaceView;
+    private boolean mInvalPending = false;
     private FrameCallback mFrameCallback;
 
     protected static class ImageRendererWrapper {
@@ -164,7 +161,7 @@ public class TiledImageView extends FrameLayout {
         }
     }
 
-    @Thunk class TileRenderer implements Renderer {
+    private class TileRenderer implements Renderer {
 
         private GLES20Canvas mCanvas;
 
