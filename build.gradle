@@ -28,7 +28,7 @@ android {
         main {
             res.srcDirs = ['res']
             java.srcDirs = ['src']
-            manifest.srcFile 'AndroidManifest.xml'
+            manifest.srcFile 'LibraryManifest.xml'
         }
     }
 }
