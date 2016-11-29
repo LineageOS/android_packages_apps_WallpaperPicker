@@ -15,7 +15,6 @@
  */
 package com.android.gallery3d.common;
 
-import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -34,6 +33,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.android.wallpaperpicker.R;
+import com.android.wallpaperpicker.common.WallpaperManagerCompat;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -42,7 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class BitmapCropTask extends AsyncTask<Void, Void, Boolean> {
+public class BitmapCropTask extends AsyncTask<Integer, Void, Boolean> {
 
     public interface OnBitmapCroppedHandler {
         public void onBitmapCropped(byte[] imageBytes);
@@ -176,12 +176,15 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Boolean> {
         return mCroppedBitmap;
     }
     public boolean cropBitmap() {
+        return cropBitmap(WallpaperManagerCompat.FLAG_SET_SYSTEM);
+    }
+    public boolean cropBitmap(int whichWallpaper) {
         boolean failure = false;
 
 
-        WallpaperManager wallpaperManager = null;
+        WallpaperManagerCompat wallpaperManager = null;
         if (mSetWallpaper) {
-            wallpaperManager = WallpaperManager.getInstance(mContext.getApplicationContext());
+            wallpaperManager = WallpaperManagerCompat.getInstance(mContext);
         }
 
 
@@ -189,7 +192,7 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Boolean> {
             try {
                 InputStream is = regenerateInputStream();
                 if (is != null) {
-                    wallpaperManager.setStream(is);
+                    wallpaperManager.setStream(is, null, true, whichWallpaper);
                     Utils.closeSilently(is);
                 }
             } catch (IOException e) {
@@ -375,7 +378,8 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Boolean> {
                 if (mSetWallpaper && wallpaperManager != null) {
                     try {
                         byte[] outByteArray = tmpOut.toByteArray();
-                        wallpaperManager.setStream(new ByteArrayInputStream(outByteArray));
+                        wallpaperManager.setStream(new ByteArrayInputStream(outByteArray),
+                                null, true, whichWallpaper);
                         if (mOnBitmapCroppedHandler != null) {
                             mOnBitmapCroppedHandler.onBitmapCropped(outByteArray);
                         }
@@ -393,8 +397,8 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Boolean> {
     }
 
     @Override
-    protected Boolean doInBackground(Void... params) {
-        return cropBitmap();
+    protected Boolean doInBackground(Integer... whichWallpaper) {
+        return cropBitmap(whichWallpaper[0]);
     }
 
     @Override

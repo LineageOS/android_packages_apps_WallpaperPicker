@@ -53,4 +53,14 @@
     <string name="pick_wallpaper">Wallpapers</string>
     <!-- Title of activity for cropping wallpapers -->
     <string name="crop_wallpaper">Crop wallpaper</string>
+
+    <!-- TODO: make these translatable once we finalize them. -->
+    <!-- Title on dialog to pick where to set a wallpaper (home screen, lock screen, or both) -->
+    <string name="which_wallpaper_title" translatable="false">Set wallpaper</string>
+    <!-- Option for setting the wallpaper only on the home screen. -->
+    <string name="which_wallpaper_option_home_screen" translatable="false">Home screen</string>
+    <!-- Option for setting the wallpaper only on the lock screen. -->
+    <string name="which_wallpaper_option_lock_screen" translatable="false">Lock screen</string>
+    <!-- Option for setting the wallpaper on both the home screen and lock screen. -->
+    <string name="which_wallpaper_option_home_screen_and_lock_screen" translatable="false">Home screen and lock screen</string>
 </resources>

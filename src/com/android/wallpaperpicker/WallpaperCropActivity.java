@@ -46,6 +46,7 @@ import com.android.photos.BitmapRegionTileSource;
 import com.android.photos.BitmapRegionTileSource.BitmapSource;
 import com.android.photos.BitmapRegionTileSource.BitmapSource.InBitmapProvider;
 import com.android.photos.views.TiledImageRenderer.TileSource;
+import com.android.wallpaperpicker.common.DialogUtils;
 
 import java.util.Collections;
 import java.util.Set;
@@ -316,7 +317,7 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
                 cropTask.getImageBounds(), shouldFadeOutOnFinish);
         cropTask.setOnEndCropHandler(onEndCrop);
         cropTask.setNoCrop(true);
-        cropTask.execute();
+        DialogUtils.executeCropTaskAfterPrompt(this, cropTask);
     }
 
     public void cropImageAndSetWallpaper(Resources res, int resId, boolean shouldFadeOutOnFinish) {
@@ -334,7 +335,7 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
                 shouldFadeOutOnFinish);
         BitmapCropTask cropTask = new BitmapCropTask(this, res, resId,
                 crop, rotation, outSize.x, outSize.y, true, false, onEndCrop);
-        cropTask.execute();
+        DialogUtils.executeCropTaskAfterPrompt(this, cropTask);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -427,7 +428,7 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
         if (onBitmapCroppedHandler != null) {
             cropTask.setOnBitmapCropped(onBitmapCroppedHandler);
         }
-        cropTask.execute();
+        DialogUtils.executeCropTaskAfterPrompt(this, cropTask);
     }
 
     public class CropAndFinishHandler implements BitmapCropTask.OnEndCropHandler {
