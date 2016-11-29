@@ -10,7 +10,7 @@
 
         <activity
             android:name="com.android.wallpaperpicker.WallpaperPickerActivity"
-            android:theme="@style/Theme.WallpaperPicker"
+            android:theme="@style/WallpaperTheme"
             android:label="@string/pick_wallpaper"
             android:icon="@mipmap/ic_launcher_wallpaper"
             android:finishOnCloseSystemDialogs="true">
@@ -22,7 +22,7 @@
 
         <activity
             android:name="com.android.wallpaperpicker.WallpaperCropActivity"
-            android:theme="@style/Theme.WallpaperCropper"
+            android:theme="@style/WallpaperTheme.Picker"
             android:label="@string/crop_wallpaper"
             android:icon="@mipmap/ic_launcher_wallpaper"
             android:finishOnCloseSystemDialogs="true">

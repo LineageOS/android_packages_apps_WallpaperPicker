@@ -55,7 +55,7 @@ import java.util.List;
 
 public class WallpaperPickerActivity extends WallpaperCropActivity
         implements OnClickListener, OnLongClickListener, ActionMode.Callback {
-    static final String TAG = "Launcher.WallpaperPickerActivity";
+    static final String TAG = "WallpaperPickerActivity";
 
     public static final int IMAGE_PICK = 5;
     public static final int PICK_WALLPAPER_THIRD_PARTY_ACTIVITY = 6;
@@ -446,7 +446,7 @@ public class WallpaperPickerActivity extends WallpaperCropActivity
     }
 
     public Pair<ApplicationInfo, Integer> getWallpaperArrayResourceId() {
-        return new Pair<ApplicationInfo, Integer>(getApplicationInfo(), R.array.wallpapers);
+        return new Pair<>(getApplicationInfo(), R.array.wallpapers);
     }
 
     private void addWallpapers(ArrayList<WallpaperTileInfo> known, Resources res,
