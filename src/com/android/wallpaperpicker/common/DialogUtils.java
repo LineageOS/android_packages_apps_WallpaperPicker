@@ -11,38 +11,6 @@ import com.android.wallpaperpicker.R;
  * Utility class used to show dialogs for things like picking which wallpaper to set.
  */
 public class DialogUtils {
-    //TODO: @TargetApi(Build.VERSION_CODES.N)
-    /**
-     * Prompts user to select "Home screen," "Lock screen," or "Home screen and lock screen."
-     *
-     * Note: This method must be called from the UI thread.
-     */
-    public static void showWhichWallpaperDialog(Context context,
-            DialogInterface.OnClickListener onClickListener,
-            DialogInterface.OnCancelListener onCancelListener) {
-        new AlertDialog.Builder(context)
-                .setTitle(R.string.wallpaper_instructions)
-                .setItems(R.array.which_wallpaper_options, onClickListener)
-                .setOnCancelListener(onCancelListener)
-                .show();
-    }
-
-    //TODO: @TargetApi(Build.VERSION_CODES.N)
-    /**
-     * Prompts user to select "Home screen" or "Home screen and lock screen."
-     *
-     * Note: This method must be called from the UI thread.
-     */
-    public static void showWhichWallpaperHomeOrBothDialog(Context context,
-            DialogInterface.OnClickListener onClickListener,
-            DialogInterface.OnCancelListener onCancelListener) {
-        new AlertDialog.Builder(context)
-                .setTitle(R.string.wallpaper_instructions)
-                .setItems(R.array.which_wallpaper_options_home_or_both, onClickListener)
-                .setOnCancelListener(onCancelListener)
-                .show();
-    }
-
     /**
      * Calls cropTask.execute(), once the user has selected which wallpaper to set. On pre-N
      * devices, the prompt is not displayed since there is no API to set the lockscreen wallpaper.
@@ -53,21 +21,25 @@ public class DialogUtils {
             Context context, final AsyncTask<Integer, ?, ?> cropTask,
             DialogInterface.OnCancelListener onCancelListener) {
         if (Utilities.isAtLeastN()) {
-            showWhichWallpaperDialog(context, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int selectedItemIndex) {
-                    int whichWallpaper;
-                    if (selectedItemIndex == 0) {
-                        whichWallpaper = WallpaperManagerCompat.FLAG_SET_SYSTEM;
-                    } else if (selectedItemIndex == 1) {
-                        whichWallpaper = WallpaperManagerCompat.FLAG_SET_LOCK;
-                    } else {
-                        whichWallpaper = WallpaperManagerCompat.FLAG_SET_SYSTEM
-                                | WallpaperManagerCompat.FLAG_SET_LOCK;
+            new AlertDialog.Builder(context)
+                    .setTitle(R.string.wallpaper_instructions)
+                    .setItems(R.array.which_wallpaper_options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int selectedItemIndex) {
+                        int whichWallpaper;
+                        if (selectedItemIndex == 0) {
+                            whichWallpaper = WallpaperManagerCompat.FLAG_SET_SYSTEM;
+                        } else if (selectedItemIndex == 1) {
+                            whichWallpaper = WallpaperManagerCompat.FLAG_SET_LOCK;
+                        } else {
+                            whichWallpaper = WallpaperManagerCompat.FLAG_SET_SYSTEM
+                                    | WallpaperManagerCompat.FLAG_SET_LOCK;
+                        }
+                        cropTask.execute(whichWallpaper);
                     }
-                    cropTask.execute(whichWallpaper);
-                }
-            }, onCancelListener);
+                })
+                .setOnCancelListener(onCancelListener)
+                .show();
         } else {
             cropTask.execute(WallpaperManagerCompat.FLAG_SET_SYSTEM);
         }
