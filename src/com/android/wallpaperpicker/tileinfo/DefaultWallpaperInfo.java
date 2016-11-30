@@ -64,7 +64,7 @@ public class DefaultWallpaperInfo extends DrawableThumbWallpaperInfo {
                     }
                     clearWallpaperAndFinish(a, whichWallpaper);
                 }
-            });
+            }, a.getOnDialogCancelListener());
         } else {
             clearWallpaperAndFinish(a, WallpaperManagerCompat.FLAG_SET_SYSTEM);
         }

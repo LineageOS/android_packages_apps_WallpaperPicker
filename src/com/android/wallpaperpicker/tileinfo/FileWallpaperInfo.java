@@ -81,7 +81,7 @@ public class FileWallpaperInfo extends DrawableThumbWallpaperInfo {
             }
         };
 
-        DialogUtils.executeCropTaskAfterPrompt(a, cropTask);
+        DialogUtils.executeCropTaskAfterPrompt(a, cropTask, a.getOnDialogCancelListener());
     }
 
     @Override
