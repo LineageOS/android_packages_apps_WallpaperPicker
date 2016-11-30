@@ -126,4 +126,13 @@ public class Utils {
         }
         return cropRect;
     }
+
+    /**
+     * Find the min x that 1 / x >= scale
+     */
+    public static int computeSampleSizeLarger(float scale) {
+        int initialSize = (int) Math.floor(1f / scale);
+        if (initialSize <= 1) return 1;
+        return initialSize <= 8 ? prevPowerOf2(initialSize) : (initialSize / 8 * 8);
+    }
 }

@@ -39,14 +39,14 @@ import android.view.Display;
 import android.view.View;
 import android.widget.Toast;
 
-import com.android.gallery3d.common.BitmapCropTask;
-import com.android.gallery3d.common.BitmapUtils;
+import com.android.wallpaperpicker.common.CropAndSetWallpaperTask;
 import com.android.gallery3d.common.Utils;
 import com.android.photos.BitmapRegionTileSource;
 import com.android.photos.BitmapRegionTileSource.BitmapSource;
 import com.android.photos.BitmapRegionTileSource.BitmapSource.InBitmapProvider;
 import com.android.photos.views.TiledImageRenderer.TileSource;
 import com.android.wallpaperpicker.common.DialogUtils;
+import com.android.wallpaperpicker.common.InputStreamProvider;
 
 import java.util.Collections;
 import java.util.Set;
@@ -115,8 +115,8 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
         mSetWallpaperButton = findViewById(R.id.set_wallpaper_button);
 
         // Load image in background
-        final BitmapRegionTileSource.UriBitmapSource bitmapSource =
-                new BitmapRegionTileSource.UriBitmapSource(this, imageUri);
+        final BitmapRegionTileSource.InputStreamSource bitmapSource =
+                new BitmapRegionTileSource.InputStreamSource(this, imageUri);
         mSetWallpaperButton.setEnabled(false);
         Runnable onLoad = new Runnable() {
             public void run() {
@@ -309,21 +309,10 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
         return true;
     }
 
-    public void setWallpaper(Uri uri, boolean shouldFadeOutOnFinish) {
-        int rotation = BitmapUtils.getRotationFromExif(this, uri);
-        BitmapCropTask cropTask = new BitmapCropTask(
-                this, uri, null, rotation, 0, 0, true, false, null);
-        BitmapCropTask.OnEndCropHandler onEndCrop = new CropAndFinishHandler(
-                cropTask.getImageBounds(), shouldFadeOutOnFinish);
-        cropTask.setOnEndCropHandler(onEndCrop);
-        cropTask.setNoCrop(true);
-        DialogUtils.executeCropTaskAfterPrompt(this, cropTask);
-    }
-
     public void cropImageAndSetWallpaper(Resources res, int resId, boolean shouldFadeOutOnFinish) {
         // crop this image and scale it down to the default wallpaper size for
         // this device
-        int rotation = BitmapUtils.getRotationFromExif(res, resId, this);
+        InputStreamProvider streamProvider = InputStreamProvider.fromResource(res, resId);
         Point inSize = mCropView.getSourceDimensions();
         Point outSize = WallpaperUtils.getDefaultWallpaperSize(getResources(),
                 getWindowManager());
@@ -333,19 +322,19 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
         // default wallpaper size
         CropAndFinishHandler onEndCrop = new CropAndFinishHandler(new Point(0, 0),
                 shouldFadeOutOnFinish);
-        BitmapCropTask cropTask = new BitmapCropTask(this, res, resId,
-                crop, rotation, outSize.x, outSize.y, true, false, onEndCrop);
+        CropAndSetWallpaperTask cropTask = new CropAndSetWallpaperTask(
+                streamProvider, this, crop, streamProvider.getRotationFromExif(this),
+                outSize.x, outSize.y, onEndCrop);
         DialogUtils.executeCropTaskAfterPrompt(this, cropTask);
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
     public void cropImageAndSetWallpaper(Uri uri,
-            BitmapCropTask.OnBitmapCroppedHandler onBitmapCroppedHandler,
+            CropAndSetWallpaperTask.OnBitmapCroppedHandler onBitmapCroppedHandler,
             boolean shouldFadeOutOnFinish) {
         // Give some feedback so user knows something is happening.
         mProgressView.setVisibility(View.VISIBLE);
 
-        boolean centerCrop = getResources().getBoolean(R.bool.center_crop);
         // Get the crop
         boolean ltr = mCropView.getLayoutDirection() == View.LAYOUT_DIRECTION_LTR;
 
@@ -365,14 +354,12 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
         int cropRotation = mCropView.getImageRotation();
         float cropScale = mCropView.getWidth() / (float) cropRect.width();
 
-
         Matrix rotateMatrix = new Matrix();
         rotateMatrix.setRotate(cropRotation);
         float[] rotatedInSize = new float[] { inSize.x, inSize.y };
         rotateMatrix.mapPoints(rotatedInSize);
         rotatedInSize[0] = Math.abs(rotatedInSize[0]);
         rotatedInSize[1] = Math.abs(rotatedInSize[1]);
-
 
         // due to rounding errors in the cropview renderer the edges can be slightly offset
         // therefore we ensure that the boundaries are sanely defined
@@ -384,25 +371,15 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
         // ADJUST CROP WIDTH
         // Extend the crop all the way to the right, for parallax
         // (or all the way to the left, in RTL)
-        float extraSpace;
-        if (centerCrop) {
-            extraSpace = 2f * Math.min(rotatedInSize[0] - cropRect.right, cropRect.left);
-        } else {
-            extraSpace = ltr ? rotatedInSize[0] - cropRect.right : cropRect.left;
-        }
+        float extraSpace = ltr ? rotatedInSize[0] - cropRect.right : cropRect.left;
         // Cap the amount of extra width
         float maxExtraSpace = defaultWallpaperSize.x / cropScale - cropRect.width();
         extraSpace = Math.min(extraSpace, maxExtraSpace);
 
-        if (centerCrop) {
-            cropRect.left -= extraSpace / 2f;
-            cropRect.right += extraSpace / 2f;
+        if (ltr) {
+            cropRect.right += extraSpace;
         } else {
-            if (ltr) {
-                cropRect.right += extraSpace;
-            } else {
-                cropRect.left -= extraSpace;
-            }
+            cropRect.left -= extraSpace;
         }
 
         // ADJUST CROP HEIGHT
@@ -423,15 +400,25 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
         CropAndFinishHandler onEndCrop = new CropAndFinishHandler(new Point(outWidth, outHeight),
                 shouldFadeOutOnFinish);
 
-        BitmapCropTask cropTask = new BitmapCropTask(this, uri,
-                cropRect, cropRotation, outWidth, outHeight, true, false, onEndCrop);
+        CropAndSetWallpaperTask cropTask = new CropAndSetWallpaperTask(
+                InputStreamProvider.fromUri(this, uri), this,
+                cropRect, cropRotation, outWidth, outHeight, onEndCrop);
         if (onBitmapCroppedHandler != null) {
             cropTask.setOnBitmapCropped(onBitmapCroppedHandler);
         }
         DialogUtils.executeCropTaskAfterPrompt(this, cropTask);
     }
 
-    public class CropAndFinishHandler implements BitmapCropTask.OnEndCropHandler {
+    public void setBoundsAndFinish(Point bounds, boolean overrideTransition) {
+        WallpaperUtils.saveWallpaperDimensions(bounds.x, bounds.y, this);
+        setResult(Activity.RESULT_OK);
+        finish();
+        if (overrideTransition) {
+            overridePendingTransition(0, R.anim.fade_out);
+        }
+    }
+
+    public class CropAndFinishHandler implements CropAndSetWallpaperTask.OnEndCropHandler {
         private final Point mBounds;
         private boolean mShouldFadeOutOnFinish;
 
@@ -447,13 +434,7 @@ public class WallpaperCropActivity extends Activity implements Handler.Callback 
 
         @Override
         public void run(boolean cropSucceeded) {
-            WallpaperUtils.saveWallpaperDimensions(mBounds.x, mBounds.y,
-                    WallpaperCropActivity.this);
-            setResult(Activity.RESULT_OK);
-            finish();
-            if (cropSucceeded && mShouldFadeOutOnFinish) {
-                overridePendingTransition(0, R.anim.fade_out);
-            }
+            setBoundsAndFinish(mBounds, cropSucceeded && mShouldFadeOutOnFinish);
         }
     }
 

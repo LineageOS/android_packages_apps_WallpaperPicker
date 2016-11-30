@@ -3,8 +3,8 @@ package com.android.wallpaperpicker.common;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.AsyncTask;
 
-import com.android.gallery3d.common.BitmapCropTask;
 import com.android.wallpaperpicker.R;
 
 /**
@@ -45,9 +45,10 @@ public class DialogUtils {
      * Calls cropTask.execute(), once the user has selected which wallpaper to set. On pre-N
      * devices, the prompt is not displayed since there is no API to set the lockscreen wallpaper.
      *
-     * TODO: Don't use BitmapCropTask on N+, because the new API will handle cropping instead.
+     * TODO: Don't use CropAndSetWallpaperTask on N+, because the new API will handle cropping instead.
      */
-    public static void executeCropTaskAfterPrompt(Context context, final BitmapCropTask cropTask) {
+    public static void executeCropTaskAfterPrompt(
+            Context context, final AsyncTask<Integer, ?, ?> cropTask) {
         if (Utilities.isAtLeastN()) {
             showWhichWallpaperDialog(context, new DialogInterface.OnClickListener() {
                 @Override

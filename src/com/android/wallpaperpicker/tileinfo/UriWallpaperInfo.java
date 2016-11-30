@@ -9,12 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.android.gallery3d.common.BitmapCropTask;
-import com.android.gallery3d.common.BitmapUtils;
+import com.android.wallpaperpicker.common.CropAndSetWallpaperTask;
 import com.android.photos.BitmapRegionTileSource;
 import com.android.photos.BitmapRegionTileSource.BitmapSource;
 import com.android.wallpaperpicker.R;
 import com.android.wallpaperpicker.WallpaperPickerActivity;
+import com.android.wallpaperpicker.common.InputStreamProvider;
 
 public class UriWallpaperInfo extends DrawableThumbWallpaperInfo {
 
@@ -30,8 +30,8 @@ public class UriWallpaperInfo extends DrawableThumbWallpaperInfo {
     @Override
     public void onClick(final WallpaperPickerActivity a) {
         a.setWallpaperButtonEnabled(false);
-        final BitmapRegionTileSource.UriBitmapSource bitmapSource =
-                new BitmapRegionTileSource.UriBitmapSource(a, mUri);
+        final BitmapRegionTileSource.InputStreamSource bitmapSource =
+                new BitmapRegionTileSource.InputStreamSource(a, mUri);
         a.setCropViewTileSource(bitmapSource, true, false, null, new Runnable() {
 
             @Override
@@ -53,10 +53,12 @@ public class UriWallpaperInfo extends DrawableThumbWallpaperInfo {
 
     @Override
     public void onSave(final WallpaperPickerActivity a) {
-        BitmapCropTask.OnBitmapCroppedHandler h = new BitmapCropTask.OnBitmapCroppedHandler() {
+        CropAndSetWallpaperTask.OnBitmapCroppedHandler h =
+                new CropAndSetWallpaperTask.OnBitmapCroppedHandler() {
             public void onBitmapCropped(byte[] imageBytes) {
                 // rotation is set to 0 since imageBytes has already been correctly rotated
-                Bitmap thumb = createThumbnail(a, null, imageBytes, null, 0, 0, true);
+                Bitmap thumb = createThumbnail(
+                        InputStreamProvider.fromBytes(imageBytes), a, 0, true);
                 a.getSavedImages().writeImage(thumb, imageBytes);
             }
         };
@@ -79,8 +81,9 @@ public class UriWallpaperInfo extends DrawableThumbWallpaperInfo {
         new AsyncTask<Void, Void, Bitmap>() {
             protected Bitmap doInBackground(Void...args) {
                 try {
-                    int rotation = BitmapUtils.getRotationFromExif(activity, mUri);
-                    return createThumbnail(activity, mUri, null, null, 0, rotation, false);
+                    InputStreamProvider isp = InputStreamProvider.fromUri(activity, mUri);
+                    int rotation = isp.getRotationFromExif(activity);
+                    return createThumbnail(isp, activity, rotation, false);
                 } catch (SecurityException securityException) {
                     if (activity.isActivityDestroyed()) {
                         // Temporarily granted permissions are revoked when the activity

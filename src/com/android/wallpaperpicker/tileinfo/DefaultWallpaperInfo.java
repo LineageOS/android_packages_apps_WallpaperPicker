@@ -16,11 +16,11 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
 
-import com.android.gallery3d.common.BitmapUtils;
 import com.android.wallpaperpicker.WallpaperCropActivity.CropViewScaleAndOffsetProvider;
 import com.android.wallpaperpicker.WallpaperFiles;
 import com.android.wallpaperpicker.WallpaperPickerActivity;
 import com.android.wallpaperpicker.common.DialogUtils;
+import com.android.wallpaperpicker.common.InputStreamProvider;
 import com.android.wallpaperpicker.common.Utilities;
 import com.android.wallpaperpicker.common.WallpaperManagerCompat;
 
@@ -143,8 +143,9 @@ public class DefaultWallpaperInfo extends DrawableThumbWallpaperInfo {
             thumb = BitmapFactory.decodeFile(defaultThumbFile.getAbsolutePath());
             defaultWallpaperExists = true;
         } else {
-            int rotation = BitmapUtils.getRotationFromExif(res, resId, context);
-            thumb = createThumbnail(context, null, null, sysRes, resId, rotation, false);
+            InputStreamProvider streamProvider = InputStreamProvider.fromResource(res, resId);
+            thumb = createThumbnail(
+                    streamProvider, context, streamProvider.getRotationFromExif(context), false);
             if (thumb != null) {
                 defaultWallpaperExists = saveDefaultWallpaperThumb(context, thumb);
             }
