@@ -40,4 +40,15 @@ public class WallpaperManagerCompatVN extends WallpaperManagerCompatV16 {
             super.clear(whichWallpaper);
         }
     }
+
+    @Override
+    public int getWallpaperId(int whichWallpaper) {
+        try {
+            // TODO: use mWallpaperManager.getWallpaperId(whichWallpaper) without reflection.
+            Method getWallpaperId = WallpaperManager.class.getMethod("getWallpaperId", int.class);
+            return (int) getWallpaperId.invoke(mWallpaperManager, whichWallpaper);
+        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            return -1;
+        }
+    }
 }
