@@ -17,5 +17,16 @@
 
 <resources>
     <string-array name="wallpapers" translatable="false">
+        <item>arc</item>
+        <item>colorpass</item>
+        <item>fabrik</item>
+        <item>glassbearings</item>
+        <item>harmony</item>
+        <item>iconoclast</item>
+        <item>materialeye</item>
+        <item>seasidequarry</item>
+        <item>shelfhome</item>
+        <item>slantstyle</item>
+        <item>thedeepblue</item>
     </string-array>
 </resources>
