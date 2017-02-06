@@ -23,5 +23,5 @@
      android:id="@+id/menu_delete"
      android:title="@string/wallpaper_delete"
      android:showAsAction="always"
-     android:icon="@android:drawable/ic_menu_delete" />
+     android:icon="@drawable/ic_delete" />
 </menu>
