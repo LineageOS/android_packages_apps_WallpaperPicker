@@ -36,7 +36,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="NoWallpaper"
+            android:name="com.android.wallpaperpicker.NoWallpaper"
             android:theme="@style/Preview"
             android:label="@string/no_wallpaper"
             android:icon="@drawable/nowallpaper_icon" >

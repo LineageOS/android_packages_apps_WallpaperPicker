@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.cyanogenmod.wallpapers;
+package com.android.wallpaperpicker;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
