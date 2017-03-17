@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba57610f_f436dde6",
+        "filename": "src/com/android/wallpaperpicker/NoWallpaper.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 6351
+      },
+      "writtenOn": "2017-03-17T08:37:27Z",
+      "side": 1,
+      "message": "This should probably squashed in the commit where you renamed it from com.cyanogenmod.CMWallpappers to com.cyanogenmod.wallpapers.\n\nNo need to add 2 commits to rename this in the same patch series, is there?",
+      "revId": "c6587207a4ebacbfba7c4c398c68cb92fbbf531e",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
