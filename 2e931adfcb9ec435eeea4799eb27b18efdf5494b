@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba57610f_b419857b",
+        "filename": "res/values/styles.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 6351
+      },
+      "writtenOn": "2017-03-17T08:34:57Z",
+      "side": 1,
+      "message": "Ummm, oops?",
+      "revId": "2e931adfcb9ec435eeea4799eb27b18efdf5494b",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
