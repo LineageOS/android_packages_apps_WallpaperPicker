@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba57610f_74042d15",
+        "filename": "res/values/strings.xml",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 6351
+      },
+      "writtenOn": "2017-03-17T08:33:24Z",
+      "side": 1,
+      "message": "LineageOS Wallpapers (and below too).",
+      "revId": "050e2f0f79b257322067127357fda38af996ee74",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ba57610f_1413b15d",
+        "filename": "src/com/cyanogenmod/CMWallpapers/NoWallpaper.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 6351
+      },
+      "writtenOn": "2017-03-17T08:33:24Z",
+      "side": 1,
+      "message": "Do we really want to add this new code in com.cyanogenmod?",
+      "revId": "050e2f0f79b257322067127357fda38af996ee74",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
