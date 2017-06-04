@@ -19,6 +19,7 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!-- Application name -->
+  <string name="app_name">Seleutor de fondos</string>
   <!-- Button label on Wallpaper picker screen; user selects this button to set a specific wallpaper -->
   <!-- Error message when an image is selected as a wallpaper,
          but the wallpaper picker cannot load it -->
