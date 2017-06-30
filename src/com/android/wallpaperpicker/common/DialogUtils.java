@@ -1,6 +1,7 @@
 package com.android.wallpaperpicker.common;
 
 import android.app.AlertDialog;
+import android.app.WallpaperManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
@@ -28,12 +29,12 @@ public class DialogUtils {
                     public void onClick(DialogInterface dialog, int selectedItemIndex) {
                         int whichWallpaper;
                         if (selectedItemIndex == 0) {
-                            whichWallpaper = WallpaperManagerCompat.FLAG_SET_SYSTEM;
+                            whichWallpaper = WallpaperManager.FLAG_SYSTEM;
                         } else if (selectedItemIndex == 1) {
-                            whichWallpaper = WallpaperManagerCompat.FLAG_SET_LOCK;
+                            whichWallpaper = WallpaperManager.FLAG_LOCK;
                         } else {
-                            whichWallpaper = WallpaperManagerCompat.FLAG_SET_SYSTEM
-                                    | WallpaperManagerCompat.FLAG_SET_LOCK;
+                            whichWallpaper = WallpaperManager.FLAG_SYSTEM
+                                    | WallpaperManager.FLAG_LOCK;
                         }
                         cropTask.execute(whichWallpaper);
                     }
@@ -41,7 +42,7 @@ public class DialogUtils {
                 .setOnCancelListener(onCancelListener)
                 .show();
         } else {
-            cropTask.execute(WallpaperManagerCompat.FLAG_SET_SYSTEM);
+            cropTask.execute(WallpaperManager.FLAG_SYSTEM);
         }
     }
 }
