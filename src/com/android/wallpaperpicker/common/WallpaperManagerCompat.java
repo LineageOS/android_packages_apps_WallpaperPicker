@@ -7,9 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public abstract class WallpaperManagerCompat {
-    public static final int FLAG_SET_SYSTEM = 1 << 0; // TODO: use WallpaperManager.FLAG_SET_SYSTEM
-    public static final int FLAG_SET_LOCK = 1 << 1; // TODO: use WallpaperManager.FLAG_SET_LOCK
-
     private static WallpaperManagerCompat sInstance;
     private static final Object sInstanceLock = new Object();
 
