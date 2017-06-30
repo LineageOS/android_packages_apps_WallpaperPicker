@@ -30,10 +30,10 @@ public class DialogUtils {
                         if (selectedItemIndex == 0) {
                             whichWallpaper = WallpaperManagerCompat.FLAG_SET_SYSTEM;
                         } else if (selectedItemIndex == 1) {
-                            whichWallpaper = WallpaperManagerCompat.FLAG_SET_LOCK;
+                            whichWallpaper = WallpaperManagerCompat.FLAG_LOCK;
                         } else {
                             whichWallpaper = WallpaperManagerCompat.FLAG_SET_SYSTEM
-                                    | WallpaperManagerCompat.FLAG_SET_LOCK;
+                                    | WallpaperManagerCompat.FLAG_LOCK;
                         }
                         cropTask.execute(whichWallpaper);
                     }
