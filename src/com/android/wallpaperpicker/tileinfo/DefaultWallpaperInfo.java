@@ -71,7 +71,7 @@ public class DefaultWallpaperInfo extends DrawableThumbWallpaperInfo {
             protected Boolean doInBackground(Integer... params) {
                 int whichWallpaper = params[0];
                 boolean succeeded;
-                if (whichWallpaper == WallpaperManagerCompat.FLAG_SET_LOCK) {
+                if (whichWallpaper == WallpaperManager.FLAG_LOCK) {
                     succeeded = setDefaultOnLock(a);
                 } else {
                     succeeded = clearWallpaper(a, whichWallpaper);
@@ -94,7 +94,7 @@ public class DefaultWallpaperInfo extends DrawableThumbWallpaperInfo {
                 byte[] outByteArray = tmpOut.toByteArray();
                 WallpaperManagerCompat.getInstance(a.getApplicationContext())
                         .setStream(new ByteArrayInputStream(outByteArray), null,
-                                true, WallpaperManagerCompat.FLAG_SET_LOCK);
+                                true, WallpaperManager.FLAG_LOCK);
             }
         } catch (IOException e) {
             Log.w(TAG, "Setting wallpaper to default threw exception", e);
