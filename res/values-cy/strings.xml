@@ -27,6 +27,7 @@
          an image as the wallpaper -->
   <!-- Error message when an image is selected as a wallpaper,
          but something goes wrong when the user clicks "Set wallpaper" -->
+  <string name="wallpaper_set_fail">Methwyd gosod y ddelwedd fel papur wal</string>
   <!-- Shown when wallpapers are selected in Wallpaper picker -->
   <!-- String indicating how many media item(s) is(are) selected
             eg. 1 selected [CHAR LIMIT=30] -->
@@ -38,6 +39,9 @@
   <!-- Option in "Select wallpaper from" dialog box -->
   <!-- Title of activity for cropping wallpapers -->
   <!-- Option for setting the wallpaper only on the home screen. -->
+  <string name="which_wallpaper_option_home_screen">Sgrin gartref</string>
   <!-- Option for setting the wallpaper only on the lock screen. -->
+  <string name="which_wallpaper_option_lock_screen">Sgrin cloi</string>
   <!-- Option for setting the wallpaper on both the home screen and lock screen. -->
+  <string name="which_wallpaper_option_home_screen_and_lock_screen">Sgrin gartref a sgrin cloi</string>
 </resources>
