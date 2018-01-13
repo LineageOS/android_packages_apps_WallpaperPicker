@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f821fa65_3d094068",
+        "filename": "src/com/android/wallpaperpicker/NoWallpaper.java",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2018-01-13T14:59:27Z",
+      "side": 1,
+      "message": "Import?",
+      "range": {
+        "startLine": 36,
+        "startChar": 17,
+        "endLine": 36,
+        "endChar": 36
+      },
+      "revId": "43e03b74948dc1ff9a55ace99adf6cf0da592af1",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
