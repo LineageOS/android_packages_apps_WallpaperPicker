@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1c515af3_fb53317b",
+        "filename": "src/com/android/wallpaperpicker/NoWallpaper.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2018-01-13T19:24:05Z",
+      "side": 1,
+      "message": "not here",
+      "range": {
+        "startLine": 19,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 27
+      },
+      "revId": "a6edfddf90766b16e3552c97ae17b4e6dc5cb5de",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "bbf6076b_cde2d352",
+        "filename": "src/com/android/wallpaperpicker/NoWallpaper.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2018-01-13T19:24:05Z",
+      "side": 1,
+      "message": "new line and here",
+      "revId": "a6edfddf90766b16e3552c97ae17b4e6dc5cb5de",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": false
+    }
+  ]
+}
