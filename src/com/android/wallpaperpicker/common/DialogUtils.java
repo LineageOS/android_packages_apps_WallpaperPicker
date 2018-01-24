@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.os.AsyncTask;
 
 import com.android.wallpaperpicker.R;
+import com.android.wallpaperpicker.WallpaperListBaseAdapter;
 
 /**
  * Utility class used to show dialogs for things like picking which wallpaper to set.
@@ -24,7 +25,8 @@ public class DialogUtils {
         if (Utilities.isAtLeastN()) {
             new AlertDialog.Builder(context)
                     .setTitle(R.string.wallpaper_instructions)
-                    .setItems(R.array.which_wallpaper_options, new DialogInterface.OnClickListener() {
+                    .setAdapter(new WallpaperListBaseAdapter(context),
+                            new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int selectedItemIndex) {
                         int whichWallpaper;
