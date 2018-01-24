@@ -35,7 +35,7 @@ public class NoWallpaper extends Activity {
         WallpaperManager wm = WallpaperManager.getInstance(this);
         new AlertDialog.Builder(this)
             .setTitle(R.string.wallpaper_instructions)
-            .setItems(R.array.which_wallpaper_options, new DialogInterface.OnClickListener() {
+            .setAdapter(new WallpaperListBaseAdapter(this), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int selectedItemIndex) {
                 int whichWallpaper;
