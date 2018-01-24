@@ -22,6 +22,7 @@ import android.app.WallpaperManager;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
+import android.view.WindowManager;
 import java.io.IOException;
 
 public class NoWallpaper extends Activity {
@@ -29,6 +30,8 @@ public class NoWallpaper extends Activity {
         super.onCreate(bundle);
 
         setContentView(R.layout.wallpaper_preview);
+
+        getWindow().clearFlags(WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER);
     }
 
     public void setWallpaper(View v) {
