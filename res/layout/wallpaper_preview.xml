@@ -19,7 +19,6 @@
     android:layout_height="wrap_content"
 
     android:layout_gravity="center_horizontal|bottom"
-    android:background="#88000000"
     style="?android:attr/buttonBarStyle">
 
     <Button
