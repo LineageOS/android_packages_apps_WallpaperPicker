@@ -24,7 +24,7 @@ public class DialogUtils {
         if (Utilities.isAtLeastN()) {
             new AlertDialog.Builder(context)
                     .setTitle(R.string.wallpaper_instructions)
-                    .setItems(R.array.which_wallpaper_options, new DialogInterface.OnClickListener() {
+                    .setItems(R.array.which_wallpaper_options_cm, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int selectedItemIndex) {
                         int whichWallpaper;

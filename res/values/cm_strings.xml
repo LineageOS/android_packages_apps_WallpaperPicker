@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/*
+* Copyright (C) 2013 The Android Open Source Project
+* Copyright (C) 2018 The LineageOS Project
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*      http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+-->
+
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <!-- Option for setting the wallpaper only on the home screen. -->
+    <string name="which_wallpaper_option_home_screen_cm">Home screen</string>
+    <!-- Option for setting the wallpaper only on the lock screen. -->
+    <string name="which_wallpaper_option_lock_screen_cm">Lock screen</string>
+    <!-- Option for setting the wallpaper on both the home screen and lock screen. -->
+    <string name="which_wallpaper_option_home_screen_and_lock_screen_cm">Home screen and lock screen</string>
+</resources>
