@@ -33,10 +33,10 @@ public class WallpaperListBaseAdapter extends BaseAdapter {
     private final Context context;
 
     private static Pair<Integer, Integer>[] DIALOG_ENTRIES = new Pair[] {
-        new Pair(R.drawable.ic_home_screen, R.string.which_wallpaper_option_home_screen),
-        new Pair(R.drawable.ic_lock_screen, R.string.which_wallpaper_option_lock_screen),
+        new Pair(R.drawable.ic_home_screen, R.string.which_wallpaper_option_home_screen_cm),
+        new Pair(R.drawable.ic_lock_screen, R.string.which_wallpaper_option_lock_screen_cm),
         new Pair(R.drawable.ic_home_screen_and_lock_screen,
-                R.string.which_wallpaper_option_home_screen_and_lock_screen)
+                R.string.which_wallpaper_option_home_screen_and_lock_screen_cm)
     };
 
     private class ViewHolder {
