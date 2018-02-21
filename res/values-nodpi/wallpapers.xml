@@ -17,16 +17,13 @@
 
 <resources>
     <string-array name="wallpapers" translatable="false">
-        <item>arc</item>
-        <item>colorpass</item>
-        <item>fabrik</item>
-        <item>glassbearings</item>
-        <item>harmony</item>
-        <item>iconoclast</item>
-        <item>materialeye</item>
-        <item>seasidequarry</item>
-        <item>shelfhome</item>
-        <item>slantstyle</item>
-        <item>thedeepblue</item>
+        <item>abstract_orderofchaos</item>
+        <item>abstract_spacestory</item>
+        <item>abstract_unsplash</item>
+        <item>nature_isolated</item>
+        <item>nature_light</item>
+        <item>space_nebulae</item>
+        <item>space_riseup</item>
+        <item>urban_nightroad</item>
     </string-array>
 </resources>
