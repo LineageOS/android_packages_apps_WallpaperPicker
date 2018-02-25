@@ -19,6 +19,7 @@
 */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+  <string name="no_wallpaper">Nessuno sfondo</string>
   <!-- Option for setting the wallpaper only on the home screen. -->
   <string name="which_wallpaper_option_home_screen_cm">Schermata home</string>
   <!-- Option for setting the wallpaper only on the lock screen. -->
