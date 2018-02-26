@@ -24,10 +24,6 @@ LOCAL_STATIC_JAVA_LIBRARIES := android-support-v4
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/res
 
-ifeq ($(TARGET_SCREEN_WIDTH), 1440)
-DEVICE_PACKAGE_OVERLAYS += $(LOCAL_PATH)/res_1440p
-endif
-
 LOCAL_SDK_VERSION := current
 LOCAL_PACKAGE_NAME := WallpaperPicker
 include $(BUILD_PACKAGE)
