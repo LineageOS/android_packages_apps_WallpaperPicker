@@ -24,7 +24,7 @@ LOCAL_STATIC_JAVA_LIBRARIES := android-support-v4
 LOCAL_SRC_FILES := $(call all-java-files-under, src)
 LOCAL_RESOURCE_DIR := $(LOCAL_PATH)/res
 
-ifeq ($(TARGET_SCREEN_WIDTH), 1440)
+ifeq ($(shell test $(TARGET_SCREEN_WIDTH) -gt 1080; echo $$?),0)
 LOCAL_RESOURCE_DIR += $(LOCAL_PATH)/res_1440p
 else
 LOCAL_RESOURCE_DIR += $(LOCAL_PATH)/res_1080p
