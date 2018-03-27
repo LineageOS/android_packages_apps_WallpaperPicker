@@ -21,10 +21,12 @@
   <!-- Button label on Wallpaper picker screen; user selects this button to set a specific wallpaper -->
   <!-- Error message when an image is selected as a wallpaper,
          but the wallpaper picker cannot load it -->
+  <string name="image_load_fail">Nun pudo cargase la imaxe</string>
   <!-- Error message when an image is selected as a wallpaper,
          but the wallpaper cropper cannot load it. The user will
          usually see this when using another app and trying to set
          an image as the wallpaper -->
+  <string name="wallpaper_load_fail">Nun pudo cargase la imaxe como fondu de pantalla</string>
   <!-- Error message when an image is selected as a wallpaper,
          but something goes wrong when the user clicks "Set wallpaper" -->
   <string name="wallpaper_set_fail">Nun pudo afitase la imaxe como fondu de pantalla</string>
@@ -35,8 +37,11 @@
          e.g. "Wallpaper 3 of 10" -->
   <!-- Accessibility string used to announce that a wallpaper has been selected. -->
   <!-- Label on button to delete wallpaper(s) -->
+  <string name="wallpaper_delete">Desaniciar</string>
   <!-- Label on button in Wallpaper Picker to pick an image -->
+  <string name="pick_image">Les mios semeyes</string>
   <!-- Option in "Select wallpaper from" dialog box -->
+  <string name="pick_wallpaper">Fondos de pantalla</string>
   <!-- Title of activity for cropping wallpapers -->
   <!-- Option for setting the wallpaper only on the home screen. -->
   <string name="which_wallpaper_option_home_screen">Pantalla d\'aniciu</string>
