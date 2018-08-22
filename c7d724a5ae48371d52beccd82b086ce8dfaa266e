@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "04ef9f1a_c844ac32",
+        "filename": "src/com/android/wallpaperpicker/WallpaperListBaseAdapter.java",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 11883
+      },
+      "writtenOn": "2018-08-22T07:35:10Z",
+      "side": 1,
+      "message": "linea 66, 67 and 68 at useless",
+      "revId": "c7d724a5ae48371d52beccd82b086ce8dfaa266e",
+      "serverId": "1ec6b3db-b2c1-4fa4-84a2-4c7efe89ba71",
+      "unresolved": true
+    }
+  ]
+}
