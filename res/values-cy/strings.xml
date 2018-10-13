@@ -19,7 +19,7 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
   <!-- Button label on Wallpaper picker screen; user selects this button to set a specific wallpaper -->
-  <string name="wallpaper_instructions">Gosod y papur wal</string>
+  <string name="wallpaper_instructions">Gosod fel papur wal</string>
   <!-- Error message when an image is selected as a wallpaper,
          but the wallpaper picker cannot load it -->
   <string name="image_load_fail">Methwyd â llwytho\'r ddelwedd</string>
