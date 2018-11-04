@@ -19,11 +19,11 @@
 */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <string name="no_wallpaper">Sin fondo de pantalla</string>
-  <!-- Option for setting the wallpaper only on the home screen. -->
-  <string name="which_wallpaper_option_home_screen_cm">Pantalla de inicio</string>
-  <!-- Option for setting the wallpaper only on the lock screen. -->
-  <string name="which_wallpaper_option_lock_screen_cm">Pantalla de bloqueo</string>
-  <!-- Option for setting the wallpaper on both the home screen and lock screen. -->
-  <string name="which_wallpaper_option_home_screen_and_lock_screen_cm">Pantalla de inicio y de bloqueo</string>
+    <string name="no_wallpaper">Sin fondo de pantalla</string>
+    <!-- Option for setting the wallpaper only on the home screen. -->
+    <string name="which_wallpaper_option_home_screen_cm">Pantalla de inicio</string>
+    <!-- Option for setting the wallpaper only on the lock screen. -->
+    <string name="which_wallpaper_option_lock_screen_cm">Pantalla de bloqueo</string>
+    <!-- Option for setting the wallpaper on both the home screen and lock screen. -->
+    <string name="which_wallpaper_option_home_screen_and_lock_screen_cm">Pantalla de inicio y de bloqueo</string>
 </resources>
