@@ -20,10 +20,7 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="no_wallpaper">Sense fons de pantalla</string>
-    <!-- Option for setting the wallpaper only on the home screen. -->
     <string name="which_wallpaper_option_home_screen_cm">Pantalla d\'inici</string>
-    <!-- Option for setting the wallpaper only on the lock screen. -->
     <string name="which_wallpaper_option_lock_screen_cm">Pantalla de bloqueig</string>
-    <!-- Option for setting the wallpaper on both the home screen and lock screen. -->
     <string name="which_wallpaper_option_home_screen_and_lock_screen_cm">Pantalla d\'inici i pantalla de bloqueig</string>
 </resources>
