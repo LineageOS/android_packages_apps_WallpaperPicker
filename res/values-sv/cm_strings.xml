@@ -19,9 +19,6 @@
 */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <!-- Option for setting the wallpaper only on the home screen. -->
-  <string name="which_wallpaper_option_home_screen_cm">Hemskärm</string>
-  <!-- Option for setting the wallpaper only on the lock screen. -->
-  <string name="which_wallpaper_option_lock_screen_cm">Låsskärm</string>
-  <!-- Option for setting the wallpaper on both the home screen and lock screen. -->
+    <string name="which_wallpaper_option_home_screen_cm">Hemskärm</string>
+    <string name="which_wallpaper_option_lock_screen_cm">Låsskärm</string>
 </resources>

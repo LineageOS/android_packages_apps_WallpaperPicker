@@ -19,10 +19,7 @@
 */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-  <!-- Option for setting the wallpaper only on the home screen. -->
-  <string name="which_wallpaper_option_home_screen_cm">Màn hình chính</string>
-  <!-- Option for setting the wallpaper only on the lock screen. -->
-  <string name="which_wallpaper_option_lock_screen_cm">Màn hình khóa</string>
-  <!-- Option for setting the wallpaper on both the home screen and lock screen. -->
-  <string name="which_wallpaper_option_home_screen_and_lock_screen_cm">Màn hình chính và màn hình khóa</string>
+    <string name="which_wallpaper_option_home_screen_cm">Màn hình chính</string>
+    <string name="which_wallpaper_option_lock_screen_cm">Màn hình khóa</string>
+    <string name="which_wallpaper_option_home_screen_and_lock_screen_cm">Màn hình chính và màn hình khóa</string>
 </resources>
