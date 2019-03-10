@@ -20,7 +20,4 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="no_wallpaper">Gun phàipear-balla</string>
-    <!-- Option for setting the wallpaper only on the home screen. -->
-    <!-- Option for setting the wallpaper only on the lock screen. -->
-    <!-- Option for setting the wallpaper on both the home screen and lock screen. -->
 </resources>

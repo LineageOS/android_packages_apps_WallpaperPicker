@@ -20,10 +20,7 @@
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="no_wallpaper">ללא טפט</string>
-    <!-- Option for setting the wallpaper only on the home screen. -->
     <string name="which_wallpaper_option_home_screen_cm">מסך הבית</string>
-    <!-- Option for setting the wallpaper only on the lock screen. -->
     <string name="which_wallpaper_option_lock_screen_cm">מסך נעילה</string>
-    <!-- Option for setting the wallpaper on both the home screen and lock screen. -->
     <string name="which_wallpaper_option_home_screen_and_lock_screen_cm">מסך בית ומסך נעילה</string>
 </resources>
