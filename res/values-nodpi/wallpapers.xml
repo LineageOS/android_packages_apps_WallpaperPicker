@@ -17,13 +17,14 @@
 
 <resources>
     <string-array name="wallpapers" translatable="false">
+        <item>abstract_ink</item>
         <item>abstract_orderofchaos</item>
         <item>abstract_spacestory</item>
-        <item>abstract_unsplash</item>
         <item>nature_isolated</item>
-        <item>nature_light</item>
-        <item>space_nebulae</item>
+        <item>nature_night</item>
+        <item>nature_sea</item>
         <item>space_riseup</item>
+        <item>urban_dayroad</item>
         <item>urban_nightroad</item>
     </string-array>
 </resources>
