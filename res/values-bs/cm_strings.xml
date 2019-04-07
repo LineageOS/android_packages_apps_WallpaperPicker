@@ -19,8 +19,5 @@
 */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="no_wallpaper">Nincs háttérkép</string>
-    <string name="which_wallpaper_option_home_screen_cm">Kezdőképernyő</string>
-    <string name="which_wallpaper_option_lock_screen_cm">Zárképernyő</string>
-    <string name="which_wallpaper_option_home_screen_and_lock_screen_cm">Fő és zárképernyő</string>
+    <string name="no_wallpaper">Nema pozadine</string>
 </resources>
