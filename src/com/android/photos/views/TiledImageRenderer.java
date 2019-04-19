@@ -20,13 +20,14 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.RectF;
-import android.support.v4.util.Pools.Pool;
-import android.support.v4.util.Pools.SynchronizedPool;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.LongSparseArray;
 import android.view.View;
 import android.view.WindowManager;
+
+import androidx.core.util.Pools.Pool;
+import androidx.core.util.Pools.SynchronizedPool;
 
 import com.android.gallery3d.common.Utils;
 import com.android.gallery3d.glrenderer.BasicTexture;

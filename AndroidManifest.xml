@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="com.android.wallpaperpicker"
-        android:versionCode="1"
-        android:versionName="1.0"
-        >
-
-    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="23" />
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.android.wallpaperpicker">
 
     <uses-permission android:name="android.permission.SET_WALLPAPER" />
 
-    <application>
+    <application
+        android:icon="@mipmap/ic_launcher_wallpaper"
+        android:label="@string/pick_wallpaper"
+        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
 
         <activity
             android:name="com.android.wallpaperpicker.WallpaperPickerActivity"
-            android:theme="@style/WallpaperTheme.Picker"
-            android:label="@string/pick_wallpaper"
+            android:finishOnCloseSystemDialogs="true"
             android:icon="@mipmap/ic_launcher_wallpaper"
-            android:finishOnCloseSystemDialogs="true">
+            android:label="@string/pick_wallpaper"
+            android:theme="@style/WallpaperTheme.Picker">
             <intent-filter>
                 <action android:name="android.intent.action.SET_WALLPAPER" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -25,10 +24,10 @@
 
         <activity
             android:name="com.android.wallpaperpicker.WallpaperCropActivity"
-            android:theme="@style/WallpaperTheme"
-            android:label="@string/crop_wallpaper"
+            android:finishOnCloseSystemDialogs="true"
             android:icon="@mipmap/ic_launcher_wallpaper"
-            android:finishOnCloseSystemDialogs="true">
+            android:label="@string/crop_wallpaper"
+            android:theme="@style/WallpaperTheme">
             <intent-filter>
                 <action android:name="android.service.wallpaper.CROP_AND_SET_WALLPAPER" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -38,9 +37,9 @@
 
         <activity
             android:name="com.android.wallpaperpicker.NoWallpaper"
-            android:theme="@style/NoWallpaperStyle"
+            android:icon="@mipmap/ic_nowallpaper"
             android:label="@string/no_wallpaper"
-            android:icon="@mipmap/ic_nowallpaper">
+            android:theme="@style/NoWallpaperStyle">
             <intent-filter>
                 <action android:name="android.intent.action.SET_WALLPAPER" />
                 <category android:name="android.intent.category.DEFAULT" />

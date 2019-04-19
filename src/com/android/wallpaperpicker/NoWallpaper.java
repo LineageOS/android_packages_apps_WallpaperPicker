@@ -35,7 +35,7 @@ public class NoWallpaper extends Activity {
     }
 
     public void setWallpaper(View v) {
-        WallpaperManager wm = WallpaperManager.getInstance(this);
+        final WallpaperManager wm = WallpaperManager.getInstance(this);
         new AlertDialog.Builder(this)
             .setTitle(R.string.wallpaper_instructions)
             .setAdapter(new WallpaperListBaseAdapter(this), new DialogInterface.OnClickListener() {

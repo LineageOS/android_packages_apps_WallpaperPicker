@@ -1,21 +1,21 @@
 buildscript {
     repositories {
+        google()
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
+        classpath 'com.android.tools.build:gradle:3.4.0'
     }
 }
 
-apply plugin: 'com.android.library'
+apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "24.0.1"
+    compileSdkVersion 28
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 25
+        minSdkVersion 26
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
     }
@@ -26,17 +26,18 @@ android {
     }
     sourceSets {
         main {
-            res.srcDirs = ['res']
+            res.srcDirs = ['res', 'res_1080p']
             java.srcDirs = ['src']
-            manifest.srcFile 'LibraryManifest.xml'
+            manifest.srcFile 'AndroidManifest.xml'
         }
     }
 }
 
 repositories {
+    google()
     mavenCentral()
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:25.1.1'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
 }
