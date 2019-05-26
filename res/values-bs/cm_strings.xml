@@ -19,8 +19,5 @@
 */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="no_wallpaper">ಹಿನ್ನೆಲೆಚಿತ್ರ ಬೇಡ</string>
-    <string name="which_wallpaper_option_home_screen_cm">ತವರು ಪರದೆ</string>
-    <string name="which_wallpaper_option_lock_screen_cm">ಬಿಗಿದ ಪರದೆ</string>
-    <string name="which_wallpaper_option_home_screen_and_lock_screen_cm">ತವರು ಮತ್ತು ಬಿಗಿದ ಪರದೆ</string>
+    <string name="no_wallpaper">Nema pozadine</string>
 </resources>
