@@ -19,7 +19,7 @@
 */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="no_wallpaper">Horma-irudirik ez</string>
+    <string name="no_wallpaper">Horma-paperik ez</string>
     <string name="which_wallpaper_option_home_screen_cm">Hasiera-pantaila</string>
     <string name="which_wallpaper_option_lock_screen_cm">Blokeo-pantaila</string>
     <string name="which_wallpaper_option_home_screen_and_lock_screen_cm">Hasiera-pantaila eta blokeo-pantaila</string>
