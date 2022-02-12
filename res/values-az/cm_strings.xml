@@ -18,6 +18,7 @@
 */
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="which_wallpaper_option_home_screen_cm">Hemskärm</string>
-    <string name="which_wallpaper_option_lock_screen_cm">Låsskärm</string>
+    <string name="which_wallpaper_option_home_screen_cm">Əsas ekran</string>
+    <string name="which_wallpaper_option_lock_screen_cm">Kilid ekranı</string>
+    <string name="which_wallpaper_option_home_screen_and_lock_screen_cm">Əsas ekran və kilid ekranı</string>
 </resources>
